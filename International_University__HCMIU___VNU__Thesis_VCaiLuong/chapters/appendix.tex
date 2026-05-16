@@ -1,0 +1,169 @@
+
+\chapter{API Specifications}
+
+This appendix provides representative API response structures for the VietFlood system. Use recorded Postman responses or logged API traffic to replace placeholders where available.
+
+\section{Authentication API}
+
+\textbf{Endpoint:} \texttt{POST /auth/sign\_in}
+
+\textbf{Response:}
+\begin{lstlisting}[language=JavaScript, caption=Sign In Response, label=lst:signin-response]
+{
+  "statusCode": 200,
+  "message": "Login successful",
+  "data": {
+    "accessToken": "<JWT_ACCESS_TOKEN>",
+    "refreshToken": "<JWT_REFRESH_TOKEN>",
+    "user": {
+      "id": "<uuid>",
+      "email": "<user_email>",
+      "role": "citizen"
+    }
+  }
+}
+\end{lstlisting}
+
+\section{Report Creation API}
+
+\textbf{Endpoint:} \texttt{POST /reports}
+
+\textbf{Response:}
+\begin{lstlisting}[language=JavaScript, caption=Create Report Response, label=lst:create-report-response]
+{
+  "statusCode": 201,
+  "message": "Report created successfully",
+  "data": {
+    "id": "<report_id>",
+    "category": ["flood"],
+    "description": "<description>",
+    "status": "pending",
+    "evidence": [
+      {
+        "url": "<cloudinary_url>",
+        "resourceType": "image"
+      }
+    ]
+  }
+}
+\end{lstlisting}
+
+\chapter{Interface Screenshots}
+
+Key user interface screens are shown here. These images support the main report without repeating the implementation details.
+
+\FloatBarrier
+\section{Mobile Screens}
+
+\begin{figure}[H]
+    \centering
+    \begin{minipage}[t]{0.45\linewidth}
+        \centering
+        \includegraphics[width=0.95\linewidth,keepaspectratio]{figure4-11-mobile-create-report.jpg}
+        \caption{Citizen report creation screen.}
+        \label{fig:appendix-citizen-create-report}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[t]{0.45\linewidth}
+        \centering
+        \includegraphics[width=0.95\linewidth,keepaspectratio]{figure4-12-mobile-evidence-upload.jpg}
+        \caption{Evidence upload screen on the mobile app.}
+        \label{fig:appendix-mobile-evidence-upload}
+    \end{minipage}
+\end{figure}
+\FloatBarrier
+\subsection{Relief and Admin Screens}
+\vspace{-2em}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.55\linewidth,keepaspectratio]{figure4-13-relief-report-list.jpg}
+    \caption{Relief worker report list screen.}
+    \label{fig:appendix-relief-report-list}
+\end{figure}
+\FloatBarrier
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\linewidth,keepaspectratio]{figure4-15-admin-dashboard-overview.jpg}
+    \caption{Admin dashboard overview.}
+    \label{fig:appendix-admin-dashboard}
+\end{figure}
+\FloatBarrier
+
+\chapter{Test Cases}
+
+This table summarizes the most important validation flows for the VietFlood prototype.
+
+\begin{table}[H]
+\centering
+\caption{Key VietFlood Test Cases}
+\label{tab:appendix-test-cases}
+\renewcommand{\arraystretch}{1.15}
+\small
+\begin{tabularx}{\textwidth}{|p{3.2cm}|X|p{2.8cm}|}
+\hline
+\textbf{Scenario} & \textbf{Expected Result} & \textbf{Status} \\
+\hline
+User login & Access token and user profile are returned & To be completed \\
+\hline
+Create report with evidence & Report saved and evidence links stored & To be completed \\
+\hline
+View user reports & Citizen can view own report list & To be completed \\
+\hline
+Admin verify/reject report & Report status updates correctly & To be completed \\
+\hline
+Relief user views map & Map shows report locations and markers & To be completed \\
+\hline
+Refresh token flow & New access token issued without login & To be completed \\
+\hline
+\end{tabularx}
+\end{table}
+
+\chapter{Deployment and Configuration}
+
+This chapter summarizes the deployment configuration groups used by VietFlood. Sensitive values are masked and should be provided through secure environment variables.
+
+\begin{table}[H]
+\centering
+\caption{Deployment Configuration Groups}
+\label{tab:deployment-config-groups}
+\footnotesize
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{|p{2.6cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{4.2cm}|}
+\hline
+\textbf{Group} & \textbf{Example Variables} & \textbf{Notes} \\
+\hline
+Database & \texttt{POSTGRES\_HOST}\newline
+\texttt{POSTGRES\_PORT}\newline
+\texttt{POSTGRES\_DB}\newline
+\texttt{POSTGRES\_USER\_NAME}\newline
+\texttt{POSTGRES\_PASSWORD}\newline
+\texttt{DATABASE\_URL} & Stores PostgreSQL connection settings. Real values must be masked. \\
+\hline
+JWT & \texttt{JWT\_SECRET}\newline
+\texttt{REFRESH\_SECRET} & Stores access-token and refresh-token secrets. \\
+\hline
+RabbitMQ & \texttt{RABBITMQ\_DEFAULT\_USER}\newline
+\texttt{RABBITMQ\_DEFAULT\_PASS}\newline
+\texttt{RABBITMQ\_URL} & Stores message broker connection settings. \\
+\hline
+Redis & \texttt{REDIS\_HOST}\newline
+\texttt{REDIS\_PORT}\newline
+\texttt{REDIS\_PASSWORD}\newline
+\texttt{REDIS\_DB} & Stores cache service configuration. \\
+\hline
+Cloudinary & \texttt{CLOUDINARY\_CLOUD\_NAME}\newline
+\texttt{CLOUDINARY\_API\_KEY}\newline
+\texttt{CLOUDINARY\_API\_SECRET} & Stores media upload configuration. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\section{Deployment Notes}
+
+\begin{itemize}
+    \item Use masked values for secrets in the thesis and replace them with actual values in deployment.
+    \item Store credentials in CI/CD secrets or environment configuration, not in source control.
+    \item Change default RabbitMQ credentials before production use.
+    \item Set JWT secrets as cryptographically secure strings.
+\end{itemize}

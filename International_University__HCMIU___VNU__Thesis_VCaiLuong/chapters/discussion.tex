@@ -1,0 +1,95 @@
+This chapter evaluates the VietFlood prototype against the aims of the project and the implementation presented in Chapter 4. The evaluation is based on the available source code and the implemented workflows in the backend, mobile application, web dashboard, and shared library. The main concern is whether the system supports the essential flood-reporting path: a citizen submits a report, evidence and location are preserved, administrators can review the report, and relief users can use report information for response awareness.
+
+The evaluation is limited to prototype-level checking. VietFlood has not yet been tested in a real flood response operation with citizens, administrators, and relief teams working under live conditions. Therefore, this chapter does not claim measured reductions in response time, public adoption, or emergency-service performance. It focuses on what can be observed from the implemented system and what still needs stronger testing before the project can be considered production-ready.
+
+\section{Evaluation Scope}
+
+The evaluation follows the three roles supported by VietFlood. A citizen should be able to create an account, sign in, submit flood reports with location and evidence, and view submitted reports. A relief user should be able to read reports and use location-oriented screens for response work. An administrator should be able to enter the web dashboard, inspect reports and evidence, update report status, and manage user accounts.
+
+The backend is evaluated through its service boundaries. The API gateway acts as the public entry point for REST requests and Socket.IO events. The authentication service is responsible for users, login, profile data, refresh tokens, logout, and user management. The reports service is responsible for report records, evidence metadata, status values, report cache handling, and deletion. RabbitMQ connects the gateway to the services. PostgreSQL stores durable data. Redis supports report caching. Cloudinary stores uploaded evidence files.
+
+The mobile and web clients are evaluated separately because they serve different users. The mobile application, built with Expo React Native, covers citizen and relief workflows \cite{expoDocs,reactNativeDocs}. The web dashboard, built with Next.js, supports administrator review \cite{nextjsDocs}. This separation matches the expected use of the system: citizens and relief users are more likely to work from phones, while administrators need a dashboard for checking incoming reports and changing report status.
+
+\section{Functional Evaluation}
+
+The first functional question is whether a citizen report can travel through the whole system without losing its important information. In the implemented prototype, that flow exists. The mobile report form collects category, description, address, coordinates, urgency, severity, and optional evidence files. The gateway receives the multipart request, uploads evidence to Cloudinary, and sends the report payload to the reports service through RabbitMQ. The reports service stores the record in PostgreSQL and refreshes the Redis cache for the saved report.
+
+The second question is whether the stored report can be reviewed by the right user. The admin dashboard reads reports from the same backend. It can display status, reporter information, location fields, urgency, severity, and evidence thumbnails. It also allows administrators to update report status values such as \texttt{pending}, \texttt{verified}, \texttt{resolved}, and \texttt{rejected}. This creates the main review loop of VietFlood: citizen submission, backend storage, administrator review, and status update.
+
+\begin{table}[H]
+    \centering
+    \caption{Functional evaluation of VietFlood user flows.}
+    \small
+    \setlength{\tabcolsep}{6pt}
+    \renewcommand{\arraystretch}{1.32}
+    \begin{tabular}{|p{3.3cm}|p{5.0cm}|p{6.3cm}|}
+        \hline
+        \textbf{Scenario} & \textbf{Expected behavior} & \textbf{Evaluation result} \\
+        \hline
+        Citizen account access & A citizen can register, sign in, and load profile data after authentication. & The auth service supports registration, sign-in, profile loading, and profile updates. Passwords are hashed with bcrypt, and protected requests use JWT access tokens. \\
+        \hline
+        Citizen report creation & A citizen can submit a flood report with location, description, urgency, severity, and optional evidence. & The mobile app prepares the report request, the gateway receives multipart files, Cloudinary stores evidence, and the reports service saves report data with evidence metadata. \\
+        \hline
+        Citizen report history & A citizen can view reports connected to the signed-in account. & The backend provides a user-report retrieval path, and the mobile app normalizes report fields such as coordinates, address, category, and status before display. \\
+        \hline
+        Admin report review & An administrator can inspect reports and update their status after checking evidence. & The dashboard loads report records, supports status filtering, displays evidence thumbnails, and calls the admin update route for status changes. \\
+        \hline
+        Relief report access & A relief user can view reports, open details, and work with map-based report information. & Relief screens focus on report awareness and location support. In the current permission model, relief users cannot verify or reject reports. \\
+        \hline
+        Token refresh and logout & A signed-in user can renew a session and can end it when needed. & The backend provides refresh-token and logout flows. The mobile app keeps the user's selected storage mode when refreshing tokens, while the dashboard refreshes tokens from browser storage. \\
+        \hline
+        Live location events & A client can send live coordinates, and connected clients can receive valid updates. & The Socket.IO gateway checks latitude and longitude ranges before broadcasting. Invalid coordinates produce a location error instead of being sent to other clients. \\
+        \hline
+    \end{tabular}
+    \label{tab:vietflood-functional-evaluation}
+\end{table}
+
+The relief role deserves a separate note. Some mobile screens show status-related report information, but the right to verify, reject, or resolve a report stays with administrators. This is a reasonable boundary for the prototype. Relief users need fast access to report details and map information, while status approval affects the trustworthiness of the whole platform.
+
+\section{Backend Evaluation}
+
+The backend structure is suitable for the size and purpose of the prototype. The API gateway, auth service, and reports service separate the two main business areas: identity management and flood report management. This supports the architectural goal of separating responsibilities so the system is easier to maintain and modify \cite{bass2021softwareArchitecture}. The gateway handles client-facing concerns such as HTTP routes, file upload parsing, JWT guards, role checks, and Socket.IO events. The services keep data rules and service-specific logic behind RabbitMQ message patterns.
+
+RabbitMQ is useful because the report workflow is not a single database insert \cite{rabbitmqConfirmsDocs}. A report can include evidence files. The gateway uploads those files to Cloudinary, builds evidence metadata, and sends the final payload to the reports service. The reports service then writes PostgreSQL data and updates Redis. Timeout and retry handling in the gateway gives the client a controlled failure response when a service cannot answer in time.
+
+PostgreSQL fits the current data model. Users, refresh tokens, and reports all have structured fields. Reports also need flexible evidence metadata, and JSONB is used for data such as evidence URL, public ID, and resource type \cite{postgresqlJsonDocs}. This keeps the prototype simpler than a design with a separate evidence table, while still preserving the information needed to display and delete uploaded media.
+
+Redis is used in a limited and understandable way \cite{redisDocs}. The reports service writes report cache entries after create and update operations, and deletes cache entries when reports are changed or removed. This is enough for the current prototype. If VietFlood later needs heavy map queries, province filters, or large report lists, the cache layer should be expanded beyond individual report keys.
+
+The shared package, \texttt{vietflood\_common}, is also a positive implementation choice. It keeps Cloudinary helpers, Redis helpers, and logging helpers in one place. The gateway can use shared upload utilities, while the reports service can use the shared deletion utilities. This avoids repeating infrastructure code across services without mixing the business logic of authentication and reporting.
+
+\section{Client Evaluation}
+
+The mobile application is the most important client because flood reports are usually created in the field. The implemented app covers account access, profile screens, citizen report creation, report lists, evidence upload, device location support, and relief-oriented report views. It also uses the Vietnam Provinces Open API for province and ward selection, which makes address entry closer to Vietnamese administrative data.
+
+The mobile token flow is practical for different usage situations. A user can keep tokens in Expo SecureStore for persistence, or keep them only for the current session. When the app refreshes a token, it respects the same storage decision. This is useful for people who may use a shared device or do not want the app to remain signed in after closing.
+
+The web dashboard has a narrower purpose, and that is appropriate. It is not meant to replace the mobile app. Its job is administrator review. The dashboard loads backend reports, formats report data, shows evidence thumbnails, filters by status, displays reporter details where available, and sends status updates through the API gateway. It also loads the current profile after login so non-admin users cannot enter the admin workspace.
+
+The main weakness in the clients is field consistency. The mobile app has to normalize values such as \texttt{lat}/\texttt{lng} and \texttt{latitude}/\texttt{longitude}, and it also handles different naming styles between backend and client models. This makes the app more tolerant during development, but it also suggests that the API contract should be made stricter before a wider release.
+
+\section{Security and Access Control Evaluation}
+
+VietFlood applies role-based access through the API gateway. JWT guards validate access tokens, and role guards separate citizen, relief, and admin actions. Citizens can create and manage their own reports. Relief users can read report data for response work. Administrators can update status values and manage users.
+
+Password storage uses bcrypt hashing \cite{provos1999bcrypt}. Access tokens use JWT claims to carry the user ID, username, role, first name, and last name \cite{jones2015jwt}. Refresh tokens use a separate secret and are stored with expiration and revocation information. This gives the backend a way to end sessions and reject expired refresh tokens.
+
+Some security work should be strengthened before production use. The refresh-token path should be tested carefully, especially hashing, comparison, revocation, and rotation behavior. The Socket.IO tracking feature validates coordinate ranges, but it should also be more tightly connected to authenticated users and role rules before being used during real response activities.
+
+Evidence upload also needs stronger protection. Cloudinary stores the uploaded media, but VietFlood should still enforce file count, file size, file type, and scanning rules at the gateway level. Public upload features can create spam, storage-cost, and abuse risks if limits are not applied.
+
+\section{Deployment and Operations Evaluation}
+
+The deployment setup is suitable for prototype demonstration. Local development can run the gateway, auth service, reports service, RabbitMQ, and Redis through Docker Compose \cite{dockerComposeDocs}. The production workflow builds Docker images for the backend services, pushes them to Docker Hub, and deploys the multi-container application to Azure App Service \cite{githubActionsDocs,azureAppServiceContainersDocs}.
+
+Runtime configuration is handled through environment variables. The database URL, Redis settings, RabbitMQ credentials, JWT secrets, refresh-token secret, Cloudinary credentials, and administrator seed values are not written directly into the source code. This is important because the same service images can be run with different settings in local and deployed environments.
+
+The largest operational gap is monitoring. The shared logger gives the services a consistent logging style, but a real deployment would need more than logs. Health checks, alerting, error dashboards, upload failure tracking, and rollback steps would make the system easier to operate. In a flood reporting context, administrators need to know quickly when reports stop arriving, uploads fail, or a backend service becomes unavailable.
+
+\section{Evaluation Result}
+
+The evaluation shows that VietFlood satisfies the core prototype requirements. A citizen can submit a flood report with location and evidence. The backend can store the report, preserve evidence metadata, and expose the report for review. Administrators can inspect reports and change their status from the web dashboard. Relief users can view report information and use mobile screens that support location awareness.
+
+The system is still a prototype, not an operational disaster-response platform. It needs user testing, load testing, slower-network testing, stronger upload limits, stricter tracking authorization, clearer API contracts, and better monitoring. The current code demonstrates that the main software workflow is feasible. It does not yet prove that the system will remain reliable during a real flood event with many users and unstable network conditions.
+
+For the thesis scope, the result is acceptable. VietFlood demonstrates a multi-platform flood monitoring and reporting system using a NestJS microservice backend, a React Native mobile client, a Next.js admin dashboard, PostgreSQL, Redis, RabbitMQ, Cloudinary, Docker, and Azure deployment. The next evaluation step should move from implementation review to controlled trials with real users, real devices, and larger report volumes.

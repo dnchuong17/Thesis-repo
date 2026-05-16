@@ -1,0 +1,22 @@
+{
+  "latex-workshop.latex.tools": [
+    {
+      "name": "pdflatex-texlive",
+      "command": "/Library/TeX/texbin/pdflatex",
+      "args": [
+        "-interaction=nonstopmode",
+        "-synctex=1",
+        "%DOC%"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "pdflatex",
+      "tools": [
+        "pdflatex-texlive"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipe.default": "pdflatex"
+}
