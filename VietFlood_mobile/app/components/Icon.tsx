@@ -1,0 +1,134 @@
+import {
+  ImageStyle,
+  StyleProp,
+  TouchableOpacity,
+  TouchableOpacityProps,
+  View,
+  ViewProps,
+  ViewStyle,
+} from "react-native"
+import {
+  ArrowLeftIcon,
+  BellIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CheckIcon,
+  EyeSlashIcon,
+  BugAntIcon,
+  LockClosedIcon,
+  Bars3Icon,
+  EllipsisHorizontalIcon,
+  Cog6ToothIcon,
+  EyeIcon,
+  XMarkIcon,
+  PlusIcon,
+} from "react-native-heroicons/outline"
+
+import { useAppTheme } from "@/theme/context"
+
+export type IconTypes = keyof typeof iconRegistry
+
+type BaseIconProps = {
+  /**
+   * The name of the icon
+   */
+  icon: IconTypes
+
+  /**
+   * An optional tint color for the icon
+   */
+  color?: string
+
+  /**
+   * An optional size for the icon. If not provided, the icon will be sized to the icon's resolution.
+   */
+  size?: number
+
+  /**
+   * Style overrides for the icon image
+   */
+  style?: StyleProp<ImageStyle>
+
+  /**
+   * Style overrides for the icon container
+   */
+  containerStyle?: StyleProp<ViewStyle>
+}
+
+type PressableIconProps = Omit<TouchableOpacityProps, "style"> & BaseIconProps
+type IconProps = Omit<ViewProps, "style"> & BaseIconProps
+
+/**
+ * A component to render a registered icon.
+ * It is wrapped in a <TouchableOpacity />
+ * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/app/components/Icon/}
+ * @param {PressableIconProps} props - The props for the `PressableIcon` component.
+ * @returns {JSX.Element} The rendered `PressableIcon` component.
+ */
+export function PressableIcon(props: PressableIconProps) {
+  const {
+    icon,
+    color,
+    size,
+    // style: $_imageStyleOverride, // Icon components don't support style prop
+    containerStyle: $containerStyleOverride,
+    ...pressableProps
+  } = props
+
+  const { theme } = useAppTheme()
+  const IconComponent = iconRegistry[icon]
+  const iconColor = color ?? theme.colors.text
+  const iconSize = size ?? 24
+
+  return (
+    <TouchableOpacity {...pressableProps} style={$containerStyleOverride}>
+      <IconComponent color={iconColor} size={iconSize} />
+    </TouchableOpacity>
+  )
+}
+
+/**
+ * A component to render a registered icon.
+ * It is wrapped in a <View />, use `PressableIcon` if you want to react to input
+ * @see [Documentation and Examples]{@link https://docs.infinite.red/ignite-cli/boilerplate/app/components/Icon/}
+ * @param {IconProps} props - The props for the `Icon` component.
+ * @returns {JSX.Element} The rendered `Icon` component.
+ */
+export function Icon(props: IconProps) {
+  const {
+    icon,
+    color,
+    size,
+    // style: $_imageStyleOverride, // Icon components don't support style prop
+    containerStyle: $containerStyleOverride,
+    ...viewProps
+  } = props
+
+  const { theme } = useAppTheme()
+  const IconComponent = iconRegistry[icon]
+  const iconColor = color ?? theme.colors.text
+  const iconSize = size ?? 24
+
+  return (
+    <View {...viewProps} style={$containerStyleOverride}>
+      <IconComponent color={iconColor} size={iconSize} />
+    </View>
+  )
+}
+
+export const iconRegistry = {
+  back: ArrowLeftIcon,
+  bell: BellIcon,
+  caretLeft: ChevronLeftIcon,
+  caretRight: ChevronRightIcon,
+  check: CheckIcon,
+  hidden: EyeSlashIcon,
+  ladybug: BugAntIcon,
+  lock: LockClosedIcon,
+  menu: Bars3Icon,
+  more: EllipsisHorizontalIcon,
+  settings: Cog6ToothIcon,
+  view: EyeIcon,
+  x: XMarkIcon,
+  plus: PlusIcon, // Adding plus icon for ReliefScreen
+}

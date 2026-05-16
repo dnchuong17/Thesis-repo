@@ -1,0 +1,93 @@
+name: Deploy to Azure App Service
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+env:
+  # Non-sensitive configuration
+  REGISTRY: docker.io
+  DOCKERHUB_USER: nguyenchuong1712
+  AZURE_WEBAPP_NAME: vietflood-app
+  AZURE_RESOURCE_GROUP: VietFlood
+  SERVICES: api-gateway,auth-service,reports-service
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [api-gateway, auth-service, reports-service]
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ env.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push ${{ matrix.service }}
+        uses: docker/build-push-action@v5
+        timeout-minutes: 60
+        with:
+          context: .
+          file: ./apps/${{ matrix.service }}/Dockerfile
+          push: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+          tags: |
+            ${{ env.DOCKERHUB_USER }}/vietflood-${{ matrix.service }}:${{ github.sha }}
+            ${{ env.DOCKERHUB_USER }}/vietflood-${{ matrix.service }}:latest
+          build-args: |
+            NODE_OPTIONS=--max-old-space-size=3072
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Image build summary
+        run: echo "✅ Built ${{ matrix.service }} successfully"
+
+  deploy:
+    name: Deploy to Azure
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure CLI login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy multi-container using Docker Compose
+        run: |
+          # Deploy using docker-compose.prod.yml for multi-container setup
+          az webapp config container set \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.AZURE_WEBAPP_NAME }} \
+            --multicontainer-config-type compose \
+            --multicontainer-config-file docker-compose.prod.yml
+
+      - name: Restart Azure App Service
+        run: |
+          az webapp restart \
+            --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+            --name ${{ env.AZURE_WEBAPP_NAME }}
+
+      - name: Deployment summary
+        run: |
+          echo "✅ Deployment completed successfully"
+          echo "Docker image: ${{ env.DOCKERHUB_USER }}/vietflood-api-gateway:latest"
+          echo "Repository: ${{ github.repository }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo ""
+          echo "ℹ️  Environment variables are configured in Azure App Service settings"

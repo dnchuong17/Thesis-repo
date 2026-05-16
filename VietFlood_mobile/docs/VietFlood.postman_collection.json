@@ -1,0 +1,831 @@
+{
+  "info": {
+    "_postman_id": "9acaa910-d898-4aa5-a908-504d4051e619",
+    "name": "VietFlood",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37386912"
+  },
+  "item": [
+    {
+      "name": "Auth-service",
+      "item": [
+        {
+          "name": "register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"lam@gmail.com\",\n  \"username\": \"lam123\",\n  \"password\": \"123456\",\n  \"phone\": \"0901234567\",\n  \"first_name\": \"Lam\",\n  \"middle_name\": \"Van\",\n  \"last_name\": \"Nguyen\",\n  \"date_of_birth\": \"2000-01-01\",\n  \"province\": \"Ho Chi Minh\",\n  \"district\": \"District 1\",\n  \"ward\": \"Ben Nghe\",\n  \"address_line\": \"123 Nguyen Hue\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/register",
+              "protocol": "http",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "sign_in",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"lam123\",\n  \"password\": \"123456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/auth/sign_in",
+              "protocol": "http",
+              "host": [
+                "{{BASE_URL}}"
+              ],
+              "path": [
+                "auth",
+                "sign_in"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "API-gateway",
+      "item": [
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "sign in",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var token = pm.response.json().accessToken;",
+                      "if (token)",
+                      "    pm.environment.set(\"AUTH_TOKEN\", token);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\": \"lam123\",\n  \"password\": \"123456\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/sign_in",
+                  "protocol": "http",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "sign_in"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "refresh_token (Public)",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "var token = pm.response.json().accessToken;",
+                      "if (token)",
+                      "    pm.environment.set(\"AUTH_TOKEN\", token);"
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "noauth"
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"refresh\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsInVzZXJuYW1lIjoiYWRtaW4iLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE3NzQxNTIwODEsImV4cCI6MTc3NDc1Njg4MX0.UC1xpNSPmujdtNnWBQmRzQf-J2_IFxLnLKT-dk0J5Qc\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/refresh_token",
+                  "protocol": "http",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "refresh_token"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "register",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"lam@gmail.com\",\n  \"username\": \"lam123\",\n  \"password\": \"123456\",\n  \"phone\": \"0901234567\",\n  \"first_name\": \"Lam\",\n  \"middle_name\": \"Van\",\n  \"last_name\": \"Nguyen\",\n  \"date_of_birth\": \"2000-01-01\",\n  \"province\": \"Ho Chi Minh\",\n  \"district\": \"District 1\",\n  \"ward\": \"Ben Nghe\",\n  \"address_line\": \"123 Nguyen Hue\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/register",
+                  "protocol": "http",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "register"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update profile",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AUTH_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "{{AUTH_TOKEN}}",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone\": \"0901234568\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/update",
+                  "protocol": "http",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "update"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "update profile user (ADMIN + RELIEF)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AUTH_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"phone\": \"0901234568\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/update/user/7",
+                  "protocol": "http",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "update",
+                    "user",
+                    "7"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "delete user (ADMIN only)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AUTH_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/delete/2",
+                  "protocol": "http",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "delete",
+                    "2"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "profile (Authenticated)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AUTH_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{AUTH_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/profile",
+                  "protocol": "http",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "profile"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "get all users (ADMIN + RELIEF)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{AUTH_TOKEN}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{AUTH_TOKEN}}",
+                    "type": "text"
+                  }
+                ],
+                "url": {
+                  "raw": "{{BASE_URL}}/auth/all",
+                  "protocol": "http",
+                  "host": [
+                    "{{BASE_URL}}"
+                  ],
+                  "path": [
+                    "auth",
+                    "all"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Report",
+          "item": [
+            {
+              "name": "admin",
+              "item": [
+                {
+                  "name": "get all reports (ADMIN + RELIEF)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{AUTH_TOKEN}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{BASE_URL}}/reports",
+                      "protocol": "http",
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "reports"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "update report (ADMIN only)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{AUTH_TOKEN}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "category",
+                          "value": "flood",
+                          "type": "text",
+                          "uuid": "94950259-4613-4cdf-a40f-d50af7cdb218"
+                        },
+                        {
+                          "key": "description",
+                          "value": "Ngập cục bộ tại khu vực chợ.",
+                          "type": "text",
+                          "uuid": "39edc8c4-719c-4959-b565-4f84ef9a4e92"
+                        },
+                        {
+                          "key": "province",
+                          "value": "Đồng Nai",
+                          "type": "text",
+                          "uuid": "8a820f84-5ba6-41d3-833b-b9a19fd14a2e"
+                        },
+                        {
+                          "key": "ward",
+                          "value": "Xuân Phú",
+                          "type": "text",
+                          "uuid": "824c83c2-4d37-41fc-ac2f-852c31fe5fa8"
+                        },
+                        {
+                          "key": "addressLine",
+                          "value": "Khu vực chợ trung tâm",
+                          "type": "text",
+                          "uuid": "a331358f-ae3a-4992-9a10-de9bdb013217"
+                        },
+                        {
+                          "key": "files",
+                          "type": "file",
+                          "uuid": "4949efd6-2386-4152-99c9-817f7bebbd9a",
+                          "src": "/Users/macbook/Downloads/flood.jpg"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{BASE_URL}}/reports/update/35/admin/5",
+                      "protocol": "http",
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "reports",
+                        "update",
+                        "35",
+                        "admin",
+                        "5"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "delete report (ADMIN only)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{AUTH_TOKEN}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{BASE_URL}}/reports/update/35/admin/5",
+                      "protocol": "http",
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "reports",
+                        "update",
+                        "35",
+                        "admin",
+                        "5"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "relief",
+              "item": [
+                {
+                  "name": "update report (ADMIN + RELIEF)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{AUTH_TOKEN}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "category",
+                          "value": "flood",
+                          "type": "text"
+                        },
+                        {
+                          "key": "description",
+                          "value": "Ngập cục bộ tại khu vực chợ - đã xử lí.",
+                          "type": "text"
+                        },
+                        {
+                          "key": "status",
+                          "value": "resolved",
+                          "type": "text"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{BASE_URL}}/reports/relief/35/user/5",
+                      "protocol": "http",
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "reports",
+                        "relief",
+                        "35",
+                        "user",
+                        "5"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "delete report (ADMIN + RELIEF)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{AUTH_TOKEN}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{BASE_URL}}/reports/relief/35/user/5",
+                      "protocol": "http",
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "reports",
+                        "relief",
+                        "35",
+                        "user",
+                        "5"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "user",
+              "item": [
+                {
+                  "name": "create report (Authenticated)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{AUTH_TOKEN}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "category",
+                          "value": "flood",
+                          "type": "text",
+                          "uuid": "94950259-4613-4cdf-a40f-d50af7cdb218"
+                        },
+                        {
+                          "key": "description",
+                          "value": "Ngập cục bộ tại khu vực chợ.",
+                          "type": "text",
+                          "uuid": "39edc8c4-719c-4959-b565-4f84ef9a4e92"
+                        },
+                        {
+                          "key": "province",
+                          "value": "Đồng Nai",
+                          "type": "text",
+                          "uuid": "8a820f84-5ba6-41d3-833b-b9a19fd14a2e"
+                        },
+                        {
+                          "key": "ward",
+                          "value": "Xuân Phú",
+                          "type": "text",
+                          "uuid": "824c83c2-4d37-41fc-ac2f-852c31fe5fa8"
+                        },
+                        {
+                          "key": "addressLine",
+                          "value": "Khu vực chợ trung tâm",
+                          "type": "text",
+                          "uuid": "a331358f-ae3a-4992-9a10-de9bdb013217"
+                        },
+                        {
+                          "key": "userId",
+                          "value": "7",
+                          "type": "text",
+                          "uuid": "3329c34a-86a7-4cf3-9384-115b98f8e2df"
+                        },
+                        {
+                          "key": "files",
+                          "type": "file",
+                          "uuid": "4949efd6-2386-4152-99c9-817f7bebbd9a",
+                          "src": "/Users/macbook/Downloads/flood.jpg"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{BASE_URL}}/reports/create",
+                      "protocol": "http",
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "reports",
+                        "create"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "update report user (Authenticated)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{AUTH_TOKEN}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "PUT",
+                    "header": [],
+                    "body": {
+                      "mode": "formdata",
+                      "formdata": [
+                        {
+                          "key": "category",
+                          "value": "flood",
+                          "type": "text",
+                          "uuid": "94950259-4613-4cdf-a40f-d50af7cdb218"
+                        },
+                        {
+                          "key": "description",
+                          "value": "Ngập cục bộ tại khu vực chợ.",
+                          "type": "text",
+                          "uuid": "39edc8c4-719c-4959-b565-4f84ef9a4e92"
+                        },
+                        {
+                          "key": "province",
+                          "value": "Đồng Nai",
+                          "type": "text",
+                          "uuid": "8a820f84-5ba6-41d3-833b-b9a19fd14a2e"
+                        },
+                        {
+                          "key": "ward",
+                          "value": "Xuân Phú",
+                          "type": "text",
+                          "uuid": "824c83c2-4d37-41fc-ac2f-852c31fe5fa8"
+                        },
+                        {
+                          "key": "addressLine",
+                          "value": "Khu vực chợ trung tâm",
+                          "type": "text",
+                          "uuid": "a331358f-ae3a-4992-9a10-de9bdb013217"
+                        },
+                        {
+                          "key": "files",
+                          "type": "file",
+                          "uuid": "4949efd6-2386-4152-99c9-817f7bebbd9a",
+                          "src": "/Users/macbook/Downloads/flood.jpg"
+                        },
+                        {
+                          "key": "category",
+                          "value": "incident",
+                          "type": "text",
+                          "uuid": "39c1eff9-2b16-4866-959c-9398a452eb67"
+                        }
+                      ]
+                    },
+                    "url": {
+                      "raw": "{{BASE_URL}}/reports/update/35",
+                      "protocol": "http",
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "reports",
+                        "update",
+                        "35"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "get all reports for user (Authenticated)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{AUTH_TOKEN}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "GET",
+                    "header": [],
+                    "url": {
+                      "raw": "{{BASE_URL}}/reports/user",
+                      "protocol": "http",
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "reports",
+                        "user"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "delete report (Authenticated)",
+                  "request": {
+                    "auth": {
+                      "type": "bearer",
+                      "bearer": [
+                        {
+                          "key": "token",
+                          "value": "{{AUTH_TOKEN}}",
+                          "type": "string"
+                        }
+                      ]
+                    },
+                    "method": "DELETE",
+                    "header": [],
+                    "url": {
+                      "raw": "{{BASE_URL}}/reports/29",
+                      "protocol": "http",
+                      "host": [
+                        "{{BASE_URL}}"
+                      ],
+                      "path": [
+                        "reports",
+                        "29"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
