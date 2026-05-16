@@ -5,13 +5,13 @@
 \contentsline {table}{\numberline {3.1}{\ignorespaces Main materials and tools used in VietFlood development.}}{17}{table.3.1}%
 \addvspace {10\p@ }
 \contentsline {table}{\numberline {4.1}{\ignorespaces Main implementation tools used in VietFlood.}}{24}{table.4.1}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces Comparison of message brokers for the VietFlood backend.}}{25}{table.4.2}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Comparison of message brokers for the VietFlood backend.}}{24}{table.4.2}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Functional evaluation of VietFlood user flows.}}{39}{table.5.1}%
-\addvspace {10\p@ }
-\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Functional evaluation of VietFlood user flows.}}{34}{table.5.1}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {C.1}{\ignorespaces Key VietFlood Test Cases}}{51}{table.C.1}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {D.1}{\ignorespaces Deployment Configuration Groups}}{52}{table.D.1}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {C.1}{\ignorespaces Key VietFlood Test Cases}}{43}{table.C.1}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {D.1}{\ignorespaces Deployment Configuration Groups}}{44}{table.D.1}%

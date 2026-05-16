@@ -52,40 +52,39 @@
 \contentsline {section}{\numberline {3.9}Validation Method}{22}{section.3.9}%
 \contentsline {chapter}{\numberline {4}Implementation and Result}{23}{chapter.4}%
 \contentsline {section}{\numberline {4.1}Technique and Tools}{23}{section.4.1}%
-\contentsline {section}{\numberline {4.2}Messaging Broker Implementation}{25}{section.4.2}%
-\contentsline {section}{\numberline {4.3}Authentication and Authorization Implementation}{26}{section.4.3}%
-\contentsline {subsection}{\numberline {4.3.1}Authentication Mechanism Implementation}{26}{subsection.4.3.1}%
-\contentsline {subsection}{\numberline {4.3.2}Refresh Token Implementation}{28}{subsection.4.3.2}%
-\contentsline {subsection}{\numberline {4.3.3}Authorization Process Implementation}{29}{subsection.4.3.3}%
-\contentsline {section}{\numberline {4.4}Report Processing and Evidence Upload Implementation}{29}{section.4.4}%
-\contentsline {subsection}{\numberline {4.4.1}Report Update and Delete Implementation}{30}{subsection.4.4.1}%
-\contentsline {section}{\numberline {4.5}Public Library Implementation}{30}{section.4.5}%
-\contentsline {section}{\numberline {4.6}Real-Time Tracking Implementation}{31}{section.4.6}%
-\contentsline {section}{\numberline {4.7}Mobile Citizen Feature Implementation}{32}{section.4.7}%
-\contentsline {subsection}{\numberline {4.7.1}Report List and Profile Access}{32}{subsection.4.7.1}%
-\contentsline {subsection}{\numberline {4.7.2}Create Report Implementation}{32}{subsection.4.7.2}%
-\contentsline {section}{\numberline {4.8}Relief Feature Implementation}{33}{section.4.8}%
-\contentsline {section}{\numberline {4.9}Web Dashboard Implementation}{34}{section.4.9}%
-\contentsline {subsection}{\numberline {4.9.1}Evidence Review and Status Update}{35}{subsection.4.9.1}%
-\contentsline {section}{\numberline {4.10}Deployment Implementation}{36}{section.4.10}%
-\contentsline {section}{\numberline {4.11}User Management Implementation}{37}{section.4.11}%
-\contentsline {chapter}{\numberline {5}Evaluation}{38}{chapter.5}%
-\contentsline {section}{\numberline {5.1}Evaluation Scope}{38}{section.5.1}%
-\contentsline {section}{\numberline {5.2}Functional Evaluation}{38}{section.5.2}%
-\contentsline {section}{\numberline {5.3}Backend Evaluation}{40}{section.5.3}%
-\contentsline {section}{\numberline {5.4}Client Evaluation}{40}{section.5.4}%
-\contentsline {section}{\numberline {5.5}Security and Access Control Evaluation}{41}{section.5.5}%
-\contentsline {section}{\numberline {5.6}Deployment and Operations Evaluation}{41}{section.5.6}%
-\contentsline {section}{\numberline {5.7}Evaluation Result}{42}{section.5.7}%
-\contentsline {chapter}{\numberline {6}Conclusion and Future Works}{43}{chapter.6}%
-\contentsline {section}{\numberline {6.1}Conclusion}{43}{section.6.1}%
-\contentsline {section}{\numberline {6.2}Future Works}{44}{section.6.2}%
-\contentsline {chapter}{\numberline {A}API Specifications}{47}{appendix.A}%
-\contentsline {section}{\numberline {A.1}Authentication API}{47}{section.A.1}%
-\contentsline {section}{\numberline {A.2}Report Creation API}{47}{section.A.2}%
-\contentsline {chapter}{\numberline {B}Interface Screenshots}{48}{appendix.B}%
-\contentsline {section}{\numberline {B.1}Mobile Screens}{48}{section.B.1}%
-\contentsline {subsection}{\numberline {B.1.1}Relief and Admin Screens}{49}{subsection.B.1.1}%
-\contentsline {chapter}{\numberline {C}Test Cases}{51}{appendix.C}%
-\contentsline {chapter}{\numberline {D}Deployment and Configuration}{52}{appendix.D}%
-\contentsline {section}{\numberline {D.1}Deployment Notes}{52}{section.D.1}%
+\contentsline {section}{\numberline {4.2}Messaging Broker Implementation}{24}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Authentication and Authorization Implementation}{25}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Authentication Mechanism Implementation}{25}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Refresh Token Implementation}{26}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Authorization Process Implementation}{26}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}Report Processing and Evidence Upload Implementation}{27}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Report Update and Delete Implementation}{27}{subsection.4.4.1}%
+\contentsline {section}{\numberline {4.5}Public Library Implementation}{27}{section.4.5}%
+\contentsline {section}{\numberline {4.6}Real-Time Tracking Implementation}{28}{section.4.6}%
+\contentsline {section}{\numberline {4.7}Mobile Citizen Feature Implementation}{29}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Report List and Profile Access}{29}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Create Report Implementation}{29}{subsection.4.7.2}%
+\contentsline {section}{\numberline {4.8}Relief Feature Implementation}{29}{section.4.8}%
+\contentsline {section}{\numberline {4.9}Web Dashboard Implementation}{30}{section.4.9}%
+\contentsline {subsection}{\numberline {4.9.1}Evidence Review and Status Update}{30}{subsection.4.9.1}%
+\contentsline {section}{\numberline {4.10}Deployment Implementation}{31}{section.4.10}%
+\contentsline {section}{\numberline {4.11}User Management Implementation}{32}{section.4.11}%
+\contentsline {chapter}{\numberline {5}Evaluation}{33}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Evaluation Scope}{33}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Functional Evaluation}{33}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Backend Evaluation}{35}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Client Evaluation}{35}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Security and Access Control Evaluation}{36}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Deployment and Operations Evaluation}{36}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Evaluation Result}{36}{section.5.7}%
+\contentsline {chapter}{\numberline {6}Conclusion and Future Works}{37}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Conclusion}{37}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Future Works}{38}{section.6.2}%
+\contentsline {chapter}{\numberline {A}API Specifications}{41}{appendix.A}%
+\contentsline {section}{\numberline {A.1}Authentication API}{41}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Report Creation API}{41}{section.A.2}%
+\contentsline {chapter}{\numberline {B}Interface Screenshots}{42}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Screenshots}{42}{section.B.1}%
+\contentsline {chapter}{\numberline {C}Test Cases}{43}{appendix.C}%
+\contentsline {chapter}{\numberline {D}Deployment and Configuration}{44}{appendix.D}%
+\contentsline {section}{\numberline {D.1}Deployment Notes}{44}{section.D.1}%

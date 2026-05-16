@@ -1,0 +1,29 @@
+\begingroup
+\titlespacing*{\section}{0pt}{0.8em}{0.45em}
+
+\section{Conclusion}
+This thesis presented VietFlood, a multi-platform prototype for flood reporting. The system supports citizen reports, relief user awareness, and admin review. The project started from a real problem. Flood information is often shared through messages, photos, and location links. This information is useful, but it is difficult to manage when many reports arrive at the same time. VietFlood gives this process a clearer flow. A citizen can create a report in the mobile app, add evidence, give location details, and send the report to the backend for review.
+
+The completed prototype has four main parts. The NestJS backend includes the API gateway, authentication service, reports service, and live tracking gateway. The Expo React Native mobile app supports citizen and relief functions. The Next.js web dashboard supports admin login, report filtering, evidence preview, and status updates. The shared \texttt{vietflood\_common} package keeps Redis, Cloudinary, and logging utilities in one place. Because of this, backend services do not need to repeat the same infrastructure code.
+
+The implementation shows that the main report flow can work. The API gateway receives reports and evidence files. Cloudinary stores uploaded media. PostgreSQL stores users, refresh tokens, and report data. Redis stores report cache data. RabbitMQ sends backend requests from the gateway to the auth and reports services. Socket.IO supports live location updates and checks coordinate values. This design follows the microservices idea, where different functions are separated into different services and communicate through messages \cite{fowlerLewis2014microservices,dragoni2017microservices,thones2015microservices}. These parts do not solve all problems in disaster response. However, they show that a citizen report can move from mobile submission to backend storage and admin review.
+
+Role separation is also an important result. Citizens can create and manage their own reports. Relief users can read report data and use mobile screens for response awareness. Admin users can review reports and update report status. This separation keeps verification and rejection under admin control. At the same time, relief users can still check reports and locations for field work. This is important because report status affects user trust.
+
+The project also shows why flood reporting should not be only a mobile form. The mobile app is close to citizens and relief users. The web dashboard gives admins a larger screen for review. The backend keeps the rules, storage, messaging, and role checks. The shared library reduces repeated code. Together, these parts make VietFlood a base for future testing and improvement.
+
+However, VietFlood is still a prototype. It has not been tested in a real flood situation with many users, weak network connections, and urgent decisions. The current system shows the technical direction, but it is not ready for real operation yet. Before real use, it needs field testing, stronger upload rules, better monitoring, stricter live-tracking authentication, and more testing for token behavior.
+
+\section{Future Works}
+
+Future work should begin with field testing. The system needs feedback from citizens, relief workers, and administrators. They should test it with real phones and realistic network conditions. This testing can show if the report form is easy to understand, if evidence upload is reliable, and if the admin dashboard gives enough information for status review.
+
+The mobile app should also work better with poor network conditions. In a future version, citizens should be able to save reports on the phone, retry submission when the connection returns, and compress evidence files before upload. The app should also show the report state clearly, such as sent, saved, uploading, or failed.
+
+Report review can be improved with duplicate detection, spam handling, and evidence quality checks. Reports with similar coordinates, descriptions, and creation times could be grouped together for admin review. Relief workflows could also add assignment, response notes, and route history. However, verification and rejection should still stay under admin control.
+
+Security and operations should be stronger before public deployment. Refresh-token handling, file size limits, file type checks, live-tracking authentication, audit logs, health checks, service alerts, and rollback steps all need more work. The operation work should follow DevOps and deployment automation practices \cite{kim2016devopsHandbook,humble2010continuousDelivery}. If report storage or evidence upload fails, administrators should know quickly through monitoring and alerts. Docker Compose is already a useful base for container deployment, but observability, alerts, and recovery steps are still needed before production use \cite{dockerComposeDocs}.
+
+In later research, VietFlood could add simple flood analysis. The current reports already contain category, urgency, severity, coordinates, address fields, status, and timestamps. With enough verified reports, the system could create heat maps, time-based charts, or province-level summaries. These features should be added after the reporting flow becomes stable. If the input data is poor, the analysis will also be poor, so data quality must come first.
+
+\endgroup

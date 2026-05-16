@@ -1,4 +1,12 @@
 
+\begingroup
+\setlength{\textfloatsep}{0.6em}
+\setlength{\floatsep}{0.6em}
+\setlength{\intextsep}{0.6em}
+\setlength{\abovecaptionskip}{0.35em}
+\setlength{\belowcaptionskip}{0.2em}
+\lstset{aboveskip=0.45em,belowskip=0.45em}
+
 \chapter{API Specifications}
 
 This appendix provides representative API response structures for the VietFlood system. Use recorded Postman responses or logged API traffic to replace placeholders where available.
@@ -53,40 +61,38 @@ This appendix provides representative API response structures for the VietFlood 
 Key user interface screens are shown here. These images support the main report without repeating the implementation details.
 
 \FloatBarrier
-\section{Mobile Screens}
+\section{Screenshots}
 
 \begin{figure}[H]
     \centering
-    \begin{minipage}[t]{0.45\linewidth}
+    \begin{minipage}[t]{0.30\linewidth}
         \centering
-        \includegraphics[width=0.95\linewidth,keepaspectratio]{figure4-11-mobile-create-report.jpg}
+        \includegraphics[width=0.88\linewidth,keepaspectratio]{figure4-11-mobile-create-report.jpg}
         \caption{Citizen report creation screen.}
         \label{fig:appendix-citizen-create-report}
     \end{minipage}
     \hfill
-    \begin{minipage}[t]{0.45\linewidth}
+    \begin{minipage}[t]{0.30\linewidth}
         \centering
-        \includegraphics[width=0.95\linewidth,keepaspectratio]{figure4-12-mobile-evidence-upload.jpg}
-        \caption{Evidence upload screen on the mobile app.}
+        \includegraphics[width=0.88\linewidth,keepaspectratio]{figure4-12-mobile-evidence-upload.jpg}
+        \caption{Evidence upload screen.}
         \label{fig:appendix-mobile-evidence-upload}
     \end{minipage}
-\end{figure}
-\FloatBarrier
-\subsection{Relief and Admin Screens}
-\vspace{-2em}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.55\linewidth,keepaspectratio]{figure4-13-relief-report-list.jpg}
-    \caption{Relief worker report list screen.}
-    \label{fig:appendix-relief-report-list}
-\end{figure}
-\FloatBarrier
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.95\linewidth,keepaspectratio]{figure4-15-admin-dashboard-overview.jpg}
-    \caption{Admin dashboard overview.}
-    \label{fig:appendix-admin-dashboard}
+    \hfill
+    \begin{minipage}[t]{0.30\linewidth}
+        \centering
+        \includegraphics[width=0.88\linewidth,keepaspectratio]{figure4-13-relief-report-list.jpg}
+        \caption{Relief worker report list screen.}
+        \label{fig:appendix-relief-report-list}
+    \end{minipage}
+    
+    \vspace{0.55em}
+    \begin{minipage}[t]{0.82\linewidth}
+        \centering
+        \includegraphics[width=\linewidth,keepaspectratio]{figure4-15-admin-dashboard-overview.jpg}
+        \caption{Admin dashboard overview.}
+        \label{fig:appendix-admin-dashboard}
+    \end{minipage}
 \end{figure}
 \FloatBarrier
 
@@ -167,3 +173,5 @@ Cloudinary & \texttt{CLOUDINARY\_CLOUD\_NAME}\newline
     \item Change default RabbitMQ credentials before production use.
     \item Set JWT secrets as cryptographically secure strings.
 \end{itemize}
+
+\endgroup
