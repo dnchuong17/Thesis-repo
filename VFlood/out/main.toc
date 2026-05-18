@@ -1,0 +1,96 @@
+\babel@toc {english}{}\relax 
+\contentsline {chapter}{List of Tables}{vii}{chapter*.3}%
+\contentsline {chapter}{List of Figures}{ix}{chapter*.4}%
+\contentsline {chapter}{List of Abbreviations}{x}{chapter*.5}%
+\contentsline {chapter}{Abstract}{xi}{chapter*.6}%
+\contentsline {chapter}{\numberline {1}Introduction}{1}{chapter.1}%
+\contentsline {section}{\numberline {1.1}The necessity of flood reporting and relief coordination by information technology}{1}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}What is flood reporting and relief coordination by technology?}{1}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}Some approaches to supporting flood reporting and relief coordination using technology}{2}{subsection.1.1.2}%
+\contentsline {section}{\numberline {1.2}Problem Statement}{2}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Scope And Objectives}{3}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Goals of VietFlood}{4}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}System Actors and Basic Functions}{4}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.3}Thesis Structure}{5}{subsection.1.3.3}%
+\contentsline {chapter}{\numberline {2}Background and Related Works}{6}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Background}{6}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Flood Reports as Structured Field Records}{6}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}The Role of Mobile Reporting}{6}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}The Role of Web-Based Review}{7}{subsection.2.1.3}%
+\contentsline {section}{\numberline {2.2}Related Work and Technical Foundations}{7}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Informal Reporting Channels}{7}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Centralized Web Systems}{9}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}API Gateway Pattern}{10}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Message Queues Between Services}{10}{subsection.2.2.4}%
+\contentsline {subsection}{\numberline {2.2.5}Authentication and Role-Based Access}{10}{subsection.2.2.5}%
+\contentsline {subsection}{\numberline {2.2.6}Media Evidence and Cloud Storage}{11}{subsection.2.2.6}%
+\contentsline {subsection}{\numberline {2.2.7}Database and Cache}{11}{subsection.2.2.7}%
+\contentsline {subsection}{\numberline {2.2.8}Shared Infrastructure Package}{12}{subsection.2.2.8}%
+\contentsline {subsection}{\numberline {2.2.9}Containerized Deployment}{12}{subsection.2.2.9}%
+\contentsline {section}{\numberline {2.3}Comparison of Design Approaches}{13}{section.2.3}%
+\contentsline {chapter}{\numberline {3}Methodology}{14}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Requirement Analysis}{14}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Functional Requirements}{14}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Non-Functional Requirements}{15}{subsection.3.1.2}%
+\contentsline {section}{\numberline {3.2}Actor Analysis}{15}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Citizen Actor}{15}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Relief Actor}{16}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Administrator Actor}{16}{subsection.3.2.3}%
+\contentsline {section}{\numberline {3.3}Materials and Development Tools}{16}{section.3.3}%
+\contentsline {section}{\numberline {3.4}System Design Method}{17}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}API Gateway Method}{17}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Message Communication Method}{18}{subsection.3.4.2}%
+\contentsline {section}{\numberline {3.5}Database Design Method}{18}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Cache Method}{19}{subsection.3.5.1}%
+\contentsline {section}{\numberline {3.6}Workflow Design Method}{19}{section.3.6}%
+\contentsline {subsection}{\numberline {3.6.1}Evidence Handling Method}{21}{subsection.3.6.1}%
+\contentsline {subsection}{\numberline {3.6.2}Status Review Method}{21}{subsection.3.6.2}%
+\contentsline {section}{\numberline {3.7}Client Application Method}{21}{section.3.7}%
+\contentsline {subsection}{\numberline {3.7.1}Mobile Application Method}{21}{subsection.3.7.1}%
+\contentsline {subsection}{\numberline {3.7.2}Web Dashboard Method}{21}{subsection.3.7.2}%
+\contentsline {section}{\numberline {3.8}Real-Time Tracking Method}{21}{section.3.8}%
+\contentsline {section}{\numberline {3.9}Validation Method}{22}{section.3.9}%
+\contentsline {chapter}{\numberline {4}Implementation and Result}{23}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Technique and Tools}{23}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Messaging Broker Implementation}{24}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Authentication and Authorization Implementation}{25}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Authentication Mechanism Implementation}{25}{subsection.4.3.1}%
+\contentsline {subsection}{\numberline {4.3.2}Refresh Token Implementation}{25}{subsection.4.3.2}%
+\contentsline {subsection}{\numberline {4.3.3}Authorization Process Implementation}{26}{subsection.4.3.3}%
+\contentsline {section}{\numberline {4.4}Report Processing and Evidence Upload Implementation}{26}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Report Update and Delete Implementation}{26}{subsection.4.4.1}%
+\contentsline {section}{\numberline {4.5}Public Library Implementation}{27}{section.4.5}%
+\contentsline {section}{\numberline {4.6}Real-Time Tracking Implementation}{27}{section.4.6}%
+\contentsline {section}{\numberline {4.7}Mobile Citizen Feature Implementation}{28}{section.4.7}%
+\contentsline {subsection}{\numberline {4.7.1}Report List and Profile Access}{28}{subsection.4.7.1}%
+\contentsline {subsection}{\numberline {4.7.2}Create Report Implementation}{28}{subsection.4.7.2}%
+\contentsline {section}{\numberline {4.8}Relief Feature Implementation}{29}{section.4.8}%
+\contentsline {section}{\numberline {4.9}Web Dashboard Implementation}{30}{section.4.9}%
+\contentsline {subsection}{\numberline {4.9.1}Evidence Review and Status Update}{30}{subsection.4.9.1}%
+\contentsline {section}{\numberline {4.10}Deployment Implementation}{31}{section.4.10}%
+\contentsline {section}{\numberline {4.11}User Management Implementation}{31}{section.4.11}%
+\contentsline {chapter}{\numberline {5}Evaluation}{33}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Evaluation Scope and Method}{33}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Functional Coverage}{33}{section.5.2}%
+\contentsline {section}{\numberline {5.3}Client Evaluation}{34}{section.5.3}%
+\contentsline {section}{\numberline {5.4}Data Integrity and Storage}{34}{section.5.4}%
+\contentsline {section}{\numberline {5.5}Security and Access Control}{34}{section.5.5}%
+\contentsline {section}{\numberline {5.6}Deployment and Operational Readiness}{35}{section.5.6}%
+\contentsline {section}{\numberline {5.7}Evaluation Summary}{35}{section.5.7}%
+\contentsline {chapter}{\numberline {6}Conclusion and Future Works}{36}{chapter.6}%
+\contentsline {section}{\numberline {6.1}Conclusion}{36}{section.6.1}%
+\contentsline {section}{\numberline {6.2}Future Work}{36}{section.6.2}%
+\contentsline {chapter}{\numberline {A}API Response Samples}{40}{appendix.A}%
+\contentsline {section}{\numberline {A.1}API Endpoint List}{40}{section.A.1}%
+\contentsline {section}{\numberline {A.2}Sign In}{40}{section.A.2}%
+\contentsline {section}{\numberline {A.3}Refresh Access Token}{41}{section.A.3}%
+\contentsline {section}{\numberline {A.4}User Profile}{41}{section.A.4}%
+\contentsline {section}{\numberline {A.5}Create Report}{41}{section.A.5}%
+\contentsline {chapter}{\numberline {B}Interface Screenshots}{42}{appendix.B}%
+\contentsline {section}{\numberline {B.1}Screenshots}{42}{section.B.1}%
+\contentsline {chapter}{\numberline {C}Validation Test Cases}{43}{appendix.C}%
+\contentsline {section}{\numberline {C.1}Authentication and User Management}{43}{section.C.1}%
+\contentsline {section}{\numberline {C.2}Report Workflow and Evidence Handling}{43}{section.C.2}%
+\contentsline {section}{\numberline {C.3}Real-time Location Tracking (Socket.IO)}{44}{section.C.3}%
+\contentsline {chapter}{\numberline {D}Deployment and Configuration}{45}{appendix.D}%
+\contentsline {section}{\numberline {D.1}Deployment Notes}{45}{section.D.1}%

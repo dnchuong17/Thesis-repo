@@ -2,16 +2,19 @@
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {3.1}{\ignorespaces Main materials and tools used in VietFlood development.}}{17}{table.3.1}%
+\contentsline {table}{\numberline {3.1}{\ignorespaces Materials, tools, and runtime dependencies used during VietFlood development.}}{12}{table.3.1}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {4.1}{\ignorespaces Main implementation tools used in VietFlood.}}{24}{table.4.1}%
-\contentsline {table}{\numberline {4.2}{\ignorespaces Comparison of message brokers for the VietFlood backend.}}{24}{table.4.2}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces Implementation technologies used in the VietFlood prototype.}}{18}{table.4.1}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Responsibility split across backend services in VietFlood.}}{19}{table.4.2}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Functional evaluation of VietFlood user flows.}}{34}{table.5.1}%
-\addvspace {10\p@ }
-\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Observed coverage of key VietFlood workflows in the prototype.}}{28}{table.5.1}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {C.1}{\ignorespaces Key VietFlood Test Cases}}{43}{table.C.1}%
+\contentsline {table}{\numberline {A.1}{\ignorespaces REST endpoints exposed by the VietFlood API gateway.}}{34}{table.A.1}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {D.1}{\ignorespaces Deployment Configuration Groups}}{44}{table.D.1}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {C.1}{\ignorespaces Authentication and user management validation scenarios.}}{37}{table.C.1}%
+\contentsline {table}{\numberline {C.2}{\ignorespaces Report workflow and evidence handling validation scenarios.}}{37}{table.C.2}%
+\contentsline {table}{\numberline {C.3}{\ignorespaces Socket.IO live tracking validation scenarios.}}{38}{table.C.3}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {D.1}{\ignorespaces Environment variable groups used for VietFlood deployment with Docker Compose.}}{39}{table.D.1}%

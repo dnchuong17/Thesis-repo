@@ -1,89 +1,53 @@
-%% TODO: Make sure to use \textbf or \textit for highlighting keywords, and \cite{} to cite the corresponding quotations
-\section{The necessity of flood reporting and relief coordination by information technology}
+This chapter introduces the motivation for VietFlood and defines the problem addressed by the thesis. Flood events generate urgent, local information: photos of blocked roads, short messages about water level, and location pins shared between neighbors and volunteers. These signals can be valuable, but they are difficult to verify and reuse when they remain as isolated chat messages. VietFlood is designed to convert these observations into structured reports that can be stored, searched, reviewed, and tracked over time. This approach aligns with the broader idea of using citizen-generated crisis information as an input to disaster response when it is organized into usable data \cite{goodchild2010crowdsourcing,imran2015processing}.
 
-\subsection{What is flood reporting and relief coordination by technology?}
+\section{Motivation and Problem}
 
-Flood information is often noticed first by people who are already in or near the affected area. A resident may see a road becoming unsafe. A volunteer may know that one route is still open while another route is blocked. A nearby user may only have time to send a short description, a photo, or a location. These small reports matter, but they lose value when they are separated from the details needed for review.
+In real flood situations, the first useful information often comes from the field rather than from official channels. However, field reports are typically incomplete and inconsistent. A message may include a photo but no administrative address. A location pin may be shared without an explanation. Duplicate reports can describe the same incident in different wording. When information is fragmented like this, it becomes difficult for a reviewer to answer basic questions consistently: what happened, where it happened, who reported it, and whether the case has been verified or resolved.
 
-In this thesis, technology-supported flood reporting means converting those field observations into structured records that can be stored, searched, and checked later. The idea is related to citizen-generated geographic and crisis information, where local observations can help describe a situation when they are organized for processing and decision support \cite{goodchild2010crowdsourcing,imran2015processing}. For VietFlood, a report is treated as more than a message. It should carry the flood category, description, province, ward, address, coordinates, urgency, severity, evidence files, reporter identity, and review status in one record.
+The thesis problem can be summarized as follows: \textit{how to provide a practical reporting system that turns ad-hoc flood observations into structured, reviewable records, while supporting different user roles and remaining simple enough to run as a prototype}. VietFlood addresses this problem by building a multi-platform prototype that supports report submission from mobile devices, evidence upload, persistent storage, role-based access control, administrator review, and status tracking.
 
-VietFlood is developed for this reporting need. It is a multi-platform prototype for a Flood Situation Monitoring and Reporting System in Vietnam. The system brings together a mobile application for citizens and relief users, a web dashboard for administrators, a NestJS backend, and a shared TypeScript infrastructure package \cite{nestjsDocs,typescriptDocs}. The project does not attempt to forecast floods. Its focus is the later stage, when people have already observed a flood situation and the information needs to be submitted, stored, and reviewed.
+\section{Research Objectives}
 
-The backend project, \texttt{VietFlood}, is organized around four main runtime parts: an API gateway, an authentication service, a reports service, and a Socket.IO tracking gateway. The API gateway is the public entry point for HTTP and WebSocket clients. The authentication service manages registration, sign-in, profile loading, refresh tokens, logout, and user management. The reports service stores report data, evidence metadata, status changes, and cache updates.
+The main objective is to design and implement a working prototype for flood situation reporting and review. The prototype is required to demonstrate the end-to-end workflow rather than only a user interface or only a backend.
 
-The project also includes \texttt{vietflood\_common}, a shared package used by backend services. It contains common logging, Redis, and Cloudinary helpers. This separation is useful because logging, cache access, and media uploads should not behave differently from one service to another. By keeping this infrastructure code in one package, the backend can reuse the same behavior instead of copying similar helper code into each service.
-
-\subsection{Some approaches to supporting flood reporting and relief coordination using technology}
-
-VietFlood uses several practical approaches to support flood reporting and review. The first is a mobile-first reporting flow. Flood reports are usually created in the field, so the citizen and relief workflows are implemented in an Expo React Native application with TypeScript \cite{expoDocs,reactNativeDocs,typescriptDocs}. The mobile app supports authentication, profile screens, report creation, image picking, location-aware screens, relief views, maps, user overview pages, role-aware navigation, and Vietnamese or English interface text. It also uses the Vietnam Provinces Open API so address fields can be selected more consistently \cite{vietnamProvincesOpenApi}.
-
-The second approach is separating responsibilities by role. VietFlood uses citizen, relief, and admin roles. Citizens submit reports and view their own records. Relief users can view broader report information and map-related screens for field awareness. Administrators work from the web dashboard, where they can inspect evidence, search and filter reports, view reporter details, update report status, and manage users. The dashboard checks the current profile before showing admin content, so role control is not treated as only a visual decision in the interface.
-
-The third approach is evidence handling through external media storage. A flood report is easier to review when a photo is attached, but storing large image files directly in PostgreSQL is not suitable for this prototype. VietFlood receives uploaded files through the API gateway, sends them to Cloudinary under the \texttt{vietflood/reports} folder, and stores the returned URL, public ID, and resource type with the report data \cite{cloudinaryUploadDocs}. This allows the dashboard to preview evidence while still keeping enough metadata to delete remote files when a report is removed.
-
-The fourth approach is a small microservice backend. Microservice architecture is commonly described as splitting a system into services around separate capabilities instead of building one large application \cite{fowlerLewis2014microservices,thones2015microservices,dragoni2017microservices}. In VietFlood, the API gateway communicates with the authentication and reports services through RabbitMQ message patterns \cite{nestjsMicroservicesDocs,rabbitmqConfirmsDocs}. The authentication service consumes messages from \texttt{auth\_queue}, while the reports service consumes messages from \texttt{reports\_queue}. PostgreSQL stores persistent data through TypeORM, and Redis is used for cached report lookup data \cite{typeormDocs,postgresqlJsonDocs,redisDocs}. This design is more complex than a single server, but it makes the responsibility of each service easier to explain and maintain.
-
-The fifth approach is live location broadcasting. VietFlood includes a Socket.IO tracking path where connected clients can send location updates \cite{socketioDocs}. The gateway validates latitude and longitude before broadcasting the update to other clients. Invalid payloads return an error event. This is not a complete emergency dispatch feature, but it demonstrates how live movement information can be added to the reporting system.
-
-\section{Problem Statement}
-
-Flood reports are less useful when the important pieces are scattered. A photo without a location may not tell an administrator where to look. A coordinate without a description may not explain the risk. A report without a status makes it hard to know whether someone has reviewed it. These problems become more serious when many reports arrive during heavy rain.
-
-The main problem addressed in this thesis is:
-
-\begin{quote}
-How can VietFlood collect flood reports from citizens, store the report data and evidence safely, and present the reports in a form that relief users and administrators can review?
-\end{quote}
-
-This problem includes several design concerns. The report form must collect enough information to be useful while still being quick enough for a mobile user. Evidence files must remain connected to the report record after upload. Report status must be visible so that pending, verified, resolved, and rejected cases can be separated. The backend must support both the mobile application and the web dashboard without forcing each client to duplicate the same business rules.
-
-The thesis also defines what VietFlood does not solve. It does not provide flood prediction, rescue routing, satellite image processing, SMS warning delivery, official dispatch integration, offline-first synchronization, or formal GIS analysis. Those features would require different data sources, operational partners, and safety validation. The scope here is the prototype that was designed and implemented: account handling, report submission, evidence upload, role-based review, live location events, caching, and container-based deployment.
-
-\section{Scope And Objectives}
-
-The scope of VietFlood is divided into four project modules. The first module is the backend service group, \texttt{VietFlood}. It contains the API gateway, authentication service, reports service, and tracking gateway. The gateway exposes authentication and report routes, receives evidence uploads, and handles Socket.IO events. The authentication service owns user accounts and tokens. The reports service owns report records, evidence metadata, status updates, and report cache invalidation.
-
-The second module is \texttt{vietflood\_common}. This shared package provides backend infrastructure that is reused across services. It includes structured logging, Redis access, and Cloudinary upload or deletion helpers. The logger can include service name, trace context, user ID, role, request path, and method when request context is available.
-
-The third module is \texttt{VietFlood\_mobile}. It is the Expo React Native application for citizen and relief workflows. It includes login, registration, profile screens, report creation, image attachment, citizen report lists, relief report details, map screens, user overview screens, settings, and localization support. The app also normalizes backend response data because report coordinates and field names may appear in different forms such as \texttt{lat}, \texttt{lng}, latitude, longitude, snake case, and camel case.
-
-The fourth module is \texttt{Vietflood\_web}. It is a Next.js dashboard for administrator monitoring. The dashboard signs in through the backend, stores access and refresh tokens, refreshes sessions when required, loads the current profile, blocks non-admin accounts from dashboard use, and displays reports with search, status filters, evidence previews, reporter information, and status update actions.
-
-The deployment scope covers Docker Compose for the backend services, Redis, and RabbitMQ \cite{dockerComposeDocs}. The production-oriented setup uses Docker Hub images and Azure App Service \cite{azureAppServiceContainersDocs}. GitHub Actions builds and tags service images, pushes them to Docker Hub, configures the Azure App Service deployment, and restarts the application \cite{githubActionsDocs}. Environment variables are used for database URLs, RabbitMQ credentials, Redis password, JWT secrets, refresh-token secrets, Cloudinary credentials, and admin seed values.
-
-\subsection{Goals of VietFlood}
-
-The main goal of VietFlood is to deliver a working flood reporting prototype for Vietnam. The prototype should allow citizens to submit reports from mobile devices, preserve photo evidence, enforce role-based access, and give administrators a readable interface for report follow-up.
-
-The specific goals are:
-
+Specific objectives are:
 \begin{enumerate}
-    \item Build a NestJS backend that separates public access, authentication, report handling, and live tracking.
-    \item Use RabbitMQ message patterns for communication between the API gateway and internal services.
-    \item Store user accounts, refresh tokens, and flood reports in PostgreSQL through TypeORM.
-    \item Protect citizen, relief, and admin workflows with JWT access tokens, refresh tokens, and role guards.
-    \item Support report creation with category, description, address fields, coordinates, urgency, severity, and photo evidence.
-    \item Upload evidence to Cloudinary and keep the returned URL and public ID with the report record.
-    \item Use Redis for report lookup caching and clear stale cached data after report changes.
-    \item Provide an Expo React Native mobile app for citizen reporting and relief-oriented views.
-    \item Provide a Next.js web dashboard for admin login, report search, evidence review, user management, and status updates.
-    \item Prepare Docker Compose and CI/CD configuration for local and production-style backend deployment.
+    \item Design a reporting data model with location fields, evidence metadata, timestamps, and a review status suitable for administrator follow-up.
+    \item Implement a backend that separates public API handling, authentication, and report management responsibilities using a small service split \cite{fowlerLewis2014microservices,dragoni2017microservices,thones2015microservices}.
+    \item Support role-based access control using JWT authentication so citizens, relief users, and administrators see different capabilities \cite{jones2015jwt}.
+    \item Store reports and user accounts persistently using PostgreSQL and TypeORM, and store evidence metadata as structured JSON where appropriate \cite{typeormDocs,postgresqlJsonDocs}.
+    \item Store photo evidence outside the database using a media platform and keep references inside the report record \cite{cloudinaryUploadDocs}.
+    \item Provide a mobile application for citizen reporting and relief-oriented browsing using Expo React Native \cite{expoDocs,reactNativeDocs}.
+    \item Provide an administrator web dashboard using Next.js to review reports, inspect evidence, and update report status \cite{nextjsDocs}.
+    \item Package the system so it can run in a repeatable environment using Docker Compose and be deployable using CI/CD practices \cite{dockerComposeDocs,githubActionsDocs,azureAppServiceContainersDocs,humble2010continuousDelivery,kim2016devopsHandbook}.
 \end{enumerate}
 
-\subsection{System Actors and Basic Functions}
+\section{Scope and Limitations}
 
-VietFlood uses three roles: citizen, relief, and admin. The role model is intentionally simple because the prototype only needs enough separation to protect personal reports, field awareness screens, and administrator review actions.
+VietFlood is a prototype for information collection and review. It does not provide flood prediction, hydrological modeling, or automated dispatch. The prototype assumes that users can access the mobile app and that evidence uploads may be possible, but it also acknowledges that connectivity can be unreliable during floods. The system therefore prioritizes a clear data model, a role-based review workflow, and an architecture that can be tested locally and extended later.
 
-\textbf{Citizens} use the mobile app to register, sign in, manage their profile, create flood reports, attach evidence, provide location information, and view reports linked to their own account. This actor represents people who are close enough to the flood situation to submit first-hand information.
+\section{System Overview}
 
-\textbf{Relief users} use the mobile app for wider awareness. They can inspect report lists, open report details, and use map-related views. In this prototype, relief users do not verify or reject reports. Their role is focused on reading and field awareness rather than system administration.
+VietFlood consists of three user-facing components and a backend:
+\begin{itemize}
+    \item \textbf{Mobile application:} a citizen and relief client built with Expo React Native. Citizens can authenticate, submit reports with location and optional evidence, and view personal report history. Relief users can browse broader report information and map-related views \cite{expoDocs,reactNativeDocs}.
+    \item \textbf{Web dashboard:} an administrator interface built with Next.js that supports report review, evidence inspection, filtering, and status updates \cite{nextjsDocs}.
+    \item \textbf{Backend services:} a NestJS-based backend that exposes a single public API surface via an API gateway and uses internal services for authentication and report management \cite{nestjsDocs,nestjsMicroservicesDocs}.
+    \item \textbf{Supporting infrastructure:} RabbitMQ for service messaging, Redis for caching, PostgreSQL for persistence, and Cloudinary for evidence storage \cite{rabbitmqConfirmsDocs,redisDocs,postgresqlJsonDocs,cloudinaryUploadDocs}.
+\end{itemize}
 
-\textbf{Administrators} use the web dashboard. They can sign in, load reports, search by report or reporter information, filter by status, preview evidence, inspect reporter details, update report status, and manage user records. The dashboard checks the signed-in profile before allowing access to admin pages.
+The key design decision is that a report is treated as a durable record. It is not only a message. Each report includes a description, location fields and coordinates, evidence references, and a status that can be updated by administrators after review.
 
-All three roles connect through the same backend entry point. Mobile and web clients call the API gateway, and the gateway decides whether the request should go to authentication, report handling, evidence upload, or live tracking. This keeps client applications focused on user interaction while backend services handle system rules.
+\section{Key Contributions}
 
-\subsection{Thesis Structure}
+The contributions of this thesis are:
+\begin{itemize}
+    \item A clear, Vietnam-focused reporting workflow that separates citizen submission, relief browsing, and administrator verification into distinct roles.
+    \item A working multi-platform prototype (mobile + web + backend) that demonstrates report creation, evidence upload, persistent storage, and status tracking end-to-end.
+    \item A service-oriented backend structure that keeps authentication and report handling responsibilities separated while remaining small enough for a thesis prototype.
+    \item A documented API surface and evaluation checklist, supported by Appendix materials that list endpoints, response samples, and scenario-based test cases.
+\end{itemize}
 
-This thesis is organized into six chapters. Chapter 1 introduces the motivation, problem statement, scope, objectives, actors, and overall structure of VietFlood. Chapter 2 reviews background and related work on flood reporting, citizen-generated information, role-based review, microservices, message queues, media evidence, caching, real-time communication, and deployment.
+\section{Chapter Roadmap}
 
-Chapter 3 presents the methodology, including the project modules, actors, architecture, database design, use cases, workflows, deployment method, and evaluation plan. Chapter 4 describes the implementation and result of the backend, mobile application, web dashboard, shared library, and CI/CD setup. Chapter 5 evaluates the prototype and discusses current limitations. Chapter 6 concludes the thesis and outlines future work.
+The thesis is organized as follows. Chapter~2 introduces background and related work on crisis information, structured reporting, and the architectural patterns used by VietFlood. Chapter~3 presents the methodology and the design process, including actor modeling, system structure, and data model choices. Chapter~4 describes the prototype implementation across backend services, the mobile application, and the administrator dashboard. Chapter~5 evaluates the prototype through workflow walkthroughs and discusses limitations. Chapter~6 concludes the thesis and outlines future improvements.

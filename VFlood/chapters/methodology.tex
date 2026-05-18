@@ -1,71 +1,86 @@
-This chapter describes the method used to design and implement VietFlood. The work followed a software-engineering approach rather than an experimental survey method. First, the main actors and reporting workflow were defined. Second, the report data model was shaped around location, evidence, owner, urgency, severity, and review status. Third, the system was divided into backend services, shared infrastructure utilities, a mobile application, and a web dashboard. Finally, the main workflows were checked through source-level review, local deployment, and end-to-end use of the reporting path. This follows the architectural view that system structure should be guided by responsibilities and quality needs, not only by the chosen technology stack \cite{bass2021softwareArchitecture}.
+This chapter explains the design and development method used to build VietFlood. The work follows a build-and-check approach common in software engineering: define scope, model the actors and workflows, design the system structure and data model, implement the prototype, and validate the result through end-to-end scenarios. The goal is not to run a controlled experiment. The goal is to produce a coherent prototype whose structure matches the responsibilities of reporting, review, and role-based access control \cite{bass2021softwareArchitecture}.
 
-\section{Requirement Analysis}
+\section{Method Overview}
 
-The requirement analysis started from the central workflow of the project: a person observes a flood-related situation, submits a report from a mobile device, and an authorized reviewer later inspects the report. VietFlood does not attempt to solve the whole disaster-response process. The method focuses on the part that can be implemented and tested in the prototype: account handling, report submission, evidence upload, report review, and status tracking.
-
-\subsection{Functional Requirements}
-
-The functional requirements were grouped by the three roles supported by the system.
-
+The project targets one specific part of flood response: turning scattered observations into structured reports that can be reviewed and tracked over time. VietFlood does not attempt to predict floods, dispatch resources, or replace official warning systems. The methodology therefore focuses on features that can be implemented and verified within a thesis prototype:
 \begin{itemize}
-    \item \textbf{Citizen users} can register, sign in, update their profile, create flood reports, provide address and coordinate information, attach photo evidence, and view reports linked to their own account.
-    \item \textbf{Relief users} can view broader report lists, open report details, inspect map-related screens, and use report information for field awareness. They do not verify or reject reports in this prototype.
-    \item \textbf{Admin users} can use the web dashboard to view all reports, search and filter records, inspect reporter information, preview evidence, update report status, and manage user information.
+    \item authentication and session handling;
+    \item report submission with location fields and optional evidence;
+    \item persistent storage of reports and evidence metadata;
+    \item administrator review and status updates;
+    \item relief-oriented reading views, including map-related screens;
+    \item a minimal real-time channel for location sharing.
 \end{itemize}
 
-The report object is the center of the system. Each report needs category data, a written description, administrative address fields, coordinates, evidence metadata, a reporter, a severity value, an urgency flag, timestamps, and a review status. The status values are kept simple: \texttt{pending}, \texttt{verified}, \texttt{resolved}, and \texttt{rejected}. This small set is enough for the prototype and avoids a review process that would be too complex for the current scope.
+\section{Design Inputs and Constraints}
 
-\subsection{Non-Functional Requirements}
+Requirements were derived from the intended workflow and the realities of mobile reporting during disruptive conditions. The system must accept short, incomplete, and sometimes noisy input, while still producing records that can be searched and compared. Constraints that shaped the method include limited development time, prototype-level testing, and the lack of validated field datasets.
 
-The non-functional requirements came from the way the system is expected to be used. The backend should expose one public entry point for mobile and web clients. Authentication and report handling should be separated so identity logic does not become mixed with report storage and evidence handling. Uploaded images should be stored outside the relational database, while report records and evidence metadata remain searchable. The backend should also be deployable through repeatable configuration rather than manual server setup.
+\subsection{Functional Goals}
 
-These requirements led to four main design decisions. VietFlood uses an API gateway in front of internal services. RabbitMQ carries messages between the gateway, authentication service, and reports service. Cloudinary stores uploaded evidence files, while PostgreSQL stores report records and evidence metadata. Docker Compose is used to run the backend services together with Redis and RabbitMQ in a repeatable environment.
+Requirements are grouped by the three roles implemented in the prototype:
+\begin{itemize}
+    \item \textbf{Citizen:} register/sign in, manage profile fields, create reports with address and coordinates, attach photo evidence, and view personal report history.
+    \item \textbf{Relief:} browse report information and location-oriented views without changing report status.
+    \item \textbf{Administrator:} review all reports, search/filter records, inspect evidence and reporter details, update report status, and manage user accounts.
+\end{itemize}
 
-\section{Actor Analysis}
+Each report stores a short description, location fields (province, ward, address line, latitude/longitude), severity/urgency values, timestamps, and a review status. Status values are kept intentionally small in this thesis version: \texttt{pending}, \texttt{verified}, \texttt{resolved}, and \texttt{rejected}. This is enough to demonstrate review and follow-up without introducing a complex workflow engine.
 
-VietFlood has three main actors: citizen, relief, and administrator. The actors were chosen to match the real responsibilities in the prototype. Citizens submit reports, relief users read field information, and administrators review and manage the submitted records.
+\subsection{Quality and Operational Goals}
 
-\subsection{Citizen Actor}
+Several non-functional goals guided design choices:
+\begin{itemize}
+    \item \textbf{Separation of concerns:} authentication logic should not be mixed with report persistence and evidence handling.
+    \item \textbf{Evidence storage outside the database:} images should be stored in a media platform, while the database keeps searchable metadata and report fields.
+    \item \textbf{Repeatable runtime:} the system should run locally and in deployment using the same container-based configuration.
+    \item \textbf{Simple boundaries:} service splits should be justified by responsibility, not by a desire to maximize the number of services.
+\end{itemize}
 
-The citizen actor represents a person who notices a flood-related incident and submits the first structured record. The citizen workflow begins with registration or sign-in. After authentication, the user can create a report by selecting a category, writing a description, choosing location information, setting urgency and severity, and attaching optional photos. The mobile app can also help with device location and Vietnam administrative division selection.
+\section{Role and Use-Case Modeling}
+
+Actors were modeled first because they define who can perform each operation and what information each role should see. Use-case diagrams were used to keep the prototype scope clear and to avoid designing features that do not fit the stated responsibilities.
+
+\subsection{Citizen Role}
+
+The citizen actor represents a member of the public reporting an observed flood situation. The citizen workflow begins with registration or sign-in, then continues to report creation by entering a description, selecting location fields, attaching photos when available, and submitting the report. The mobile client can help by reading device location and by listing Vietnam administrative divisions to reduce inconsistent spelling.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.74\linewidth,height=0.36\textheight,keepaspectratio]{images/figure3-1-citizen-use-case.png}
-    \caption{Use case diagram for the citizen actor in VietFlood.}
+    \caption{Citizen capabilities supported by VietFlood (use case view).}
     \label{fig:method-citizen-usecase}
 \end{figure}
 
-\subsection{Relief Actor}
+\subsection{Relief Role}
 
-The relief actor represents users who need situational awareness from the submitted reports. In the mobile app, this role can use report lists, report detail screens, and map-related views. The relief role is deliberately narrower than the admin role. Relief users can inspect information for field awareness, but they do not verify, reject, or administratively close reports in this thesis version.
+The relief actor represents users who need situational awareness from submitted reports. In the prototype, the relief role can browse report lists, open details, and use map-related views. The relief role does not verify or reject reports. Keeping verification in the administrator workflow avoids conflicting status changes and keeps the trust signal (status) under one authority in this thesis scope.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.74\linewidth,height=0.36\textheight,keepaspectratio]{images/figure3-2-relief-use-case.png}
-    \caption{Use case diagram for the relief actor in VietFlood.}
+    \caption{Relief browsing features supported by VietFlood (use case view).}
     \label{fig:method-relief-usecase}
 \end{figure}
 
-\subsection{Administrator Actor}
+\subsection{Administrator Role}
 
-The administrator actor works through the web dashboard. The dashboard loads report data through the API gateway and displays report content together with reporter details, status, evidence previews, and filtering controls. Admin users are responsible for changing report status and managing user records. The web client checks the signed-in profile before showing the dashboard so a non-admin account cannot simply open the admin pages.
+The administrator actor uses the web dashboard to review incoming reports. The dashboard presents report fields, reporter details, evidence previews, and tools for filtering and searching. Administrator actions include changing status values and managing user records. The web client checks the current profile and role before showing administrator screens so a non-admin account cannot access the review workspace by direct URL navigation.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.74\linewidth,height=0.36\textheight,keepaspectratio]{images/figure3-3-admin-use-case.png}
-    \caption{Use case diagram for the administrator actor in VietFlood.}
+    \caption{Administrator review and management features (use case view).}
     \label{fig:method-admin-usecase}
 \end{figure}
 
-\section{Materials and Development Tools}
+\section{Development Materials and Tools}
 
-VietFlood was developed from four source-code modules. The backend module contains the NestJS API gateway and microservices \cite{nestjsDocs,nestjsMicroservicesDocs}. The shared module contains reusable logging, Redis, and Cloudinary utilities. The mobile module contains the Expo React Native application \cite{expoDocs,reactNativeDocs}. The web module contains the Next.js administrator dashboard \cite{nextjsDocs}. The main tools are summarized in Table~\ref{tab:method-tools}.
+Development work was organized into four code modules to keep responsibilities clear. The backend module contains the NestJS API gateway and internal services \cite{nestjsDocs,nestjsMicroservicesDocs}. The shared module (\texttt{vietflood\_common}) provides common infrastructure utilities. The mobile module contains the Expo React Native application \cite{expoDocs,reactNativeDocs}. The web module contains the Next.js administrator dashboard \cite{nextjsDocs}. Table~\ref{tab:method-tools} summarizes the main tools used.
 
 \begin{table}[htbp]
 \centering
-\caption{Main materials and tools used in VietFlood development.}
+\caption{Materials, tools, and runtime dependencies used during VietFlood development.}
 \label{tab:method-tools}
 \begin{tabular}{|>{\raggedright\arraybackslash}p{4cm}|>{\raggedright\arraybackslash}p{9cm}|}
 \hline
@@ -84,114 +99,106 @@ Runtime infrastructure & Docker, Docker Compose, PostgreSQL, Redis, RabbitMQ, Cl
 \end{tabular}
 \end{table}
 
-\section{System Design Method}
+\section{Architecture Design Approach}
 
-The backend was designed as a small microservice system. The service split was kept limited because too many services would make the prototype harder to operate without adding much value. Microservice literature emphasizes that service boundaries should clarify responsibility and support change, while still accounting for operational cost \cite{fowlerLewis2014microservices,dragoni2017microservices,thones2015microservices}. VietFlood therefore uses only the boundaries needed for the thesis: public access, authentication, report management, shared infrastructure utilities, and supporting infrastructure.
+The system was designed as a small set of services rather than a single monolithic backend. The point of the service split is not complexity; it is ownership. Authentication and report persistence evolve differently and have different failure modes. Keeping them separate reduces accidental coupling and keeps code easier to reason about during iteration. At the same time, the number of services is kept low to avoid operational overhead that would not pay off at prototype scale \cite{fowlerLewis2014microservices,dragoni2017microservices,thones2015microservices}.
 
-The API gateway receives HTTP and WebSocket traffic from clients. The authentication service owns registration, sign-in, refresh tokens, profile loading, logout, admin seeding, and user management. The reports service owns report creation, report lookup, evidence metadata, status changes, cache updates, and report deletion. Redis supports cached report lookup, RabbitMQ carries service messages, PostgreSQL stores persistent data, and Cloudinary stores uploaded images.
+In VietFlood, the API gateway is the single public entry point. It handles HTTP routes and the Socket.IO channel exposed to clients. The authentication service owns registration, sign-in, token refresh, profile operations, and user management. The reports service owns report creation, listing, status updates, evidence metadata storage, and cache invalidation. Redis, RabbitMQ, PostgreSQL, and Cloudinary provide supporting infrastructure for caching, messaging, persistence, and evidence storage.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=1\linewidth,height=0.44\textheight,keepaspectratio]{images/figure3-4-system-architecture.png}
-    \caption{VietFlood system architecture diagram.}
+    \caption{System architecture overview of VietFlood components and their interactions.}
     \label{fig:method-system-architecture}
 \end{figure}
 
-\subsection{API Gateway Method}
+\subsection{Gateway Interface Design}
 
-The gateway exposes the routes used by both client applications. Authentication routes are grouped under \texttt{/auth}, and report routes are grouped under \texttt{/reports}. Report creation uses multipart upload through the \texttt{files} field. The gateway holds uploaded files in memory long enough to upload them to Cloudinary. It then forwards the report data and evidence metadata to the reports service.
+The gateway exposes the REST interface consumed by both the mobile and web clients. Authentication routes are grouped under \texttt{/auth} and report routes under \texttt{/reports}. Report creation is implemented as a multipart upload; the gateway processes uploaded files, uploads evidence to Cloudinary, and then forwards the final report payload to the reports service. Centralizing evidence upload in the gateway avoids duplicating upload logic across services and keeps clients unaware of internal service boundaries.
 
-The gateway also applies authentication and role checks. Citizen routes are used for personal report operations. Broader report-reading routes are available to relief and admin users. Admin-specific operations are protected separately. This method keeps the clients simple while still enforcing access rules on the backend.
+The gateway also enforces JWT authentication and role checks. Citizen endpoints are scoped to personal report operations, broader report reading is available to relief and admin accounts, and administrator-only operations are protected separately.
 
-\subsection{Message Communication Method}
+\subsection{Service Messaging Design}
 
-RabbitMQ is used for communication between the gateway and internal services \cite{rabbitmqConfirmsDocs}. Authentication messages are consumed by the auth service, while report messages are consumed by the reports service. The authentication service handles message patterns for registration, sign-in, profile loading, token refresh, logout, and user operations. The reports service handles report creation, listing, lookup, update, and deletion.
+Internal service calls use RabbitMQ request--response messaging \cite{rabbitmqConfirmsDocs}. The gateway sends authentication commands to the auth service and report commands to the reports service. This makes the boundary explicit: the gateway does not directly access the database owned by the services, and each service can validate inputs and return controlled responses.
 
-This message-based method makes boundaries visible during development. A failed report submission can be inspected at the gateway request, the Cloudinary upload step, the RabbitMQ message, or the reports service handler. The gateway also uses controlled service-call behavior so a slow internal service does not leave the client waiting without a response.
+Messaging also makes troubleshooting more concrete during development. If a report creation fails, the failure can be localized to one of a small number of steps: request parsing, evidence upload, message transport, or service-side validation/persistence.
 
-\section{Database Design Method}
+\section{Data Modeling Approach}
 
-The database design was derived from the report workflow. A report needs a user owner, location fields, status, urgency, severity, evidence metadata, and timestamps. The backend uses PostgreSQL as the main database and TypeORM entities to map application objects to database tables \cite{typeormDocs,postgresqlJsonDocs}.
+The data model was designed to support the report lifecycle while staying small enough to evolve during prototyping. PostgreSQL is used for persistence and TypeORM entities map application objects to relational tables \cite{typeormDocs}. The core tables are users and reports.
 
-The user entity stores email, username, phone, hashed password, role, name fields, date of birth, address line, ward, province, and timestamps. Email, username, and phone are unique. The supported roles are \texttt{citizen}, \texttt{relief}, and \texttt{admin}.
+User records store identity fields (email, username, phone), a bcrypt-hashed password, role, basic profile information, and timestamps. Uniqueness constraints on email/username/phone prevent duplicate accounts.
 
-The report entity stores category arrays, description, image URLs, evidence JSON, province, ward, address line, latitude, longitude, status, reporter name, urgency, severity, timestamps, and owner user ID. Evidence is stored as JSON metadata because each uploaded item needs a URL, Cloudinary public ID, and resource type. PostgreSQL supports this kind of flexible structured field through JSON storage \cite{postgresqlJsonDocs}.
+Report records store a textual description, category values, administrative location fields (province, ward, address line), coordinates, urgency/severity values, timestamps, and a status field used for review. Evidence is stored as JSON metadata rather than raw bytes: each item includes a delivery URL and a Cloudinary public ID. This keeps media delivery out of the database while still making the report record self-contained for review \cite{postgresqlJsonDocs,cloudinaryUploadDocs}.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\linewidth,height=0.42\textheight,keepaspectratio]{images/figure3-5-database-schema.png}
-    \caption{Database schema diagram for VietFlood.}
+    \caption{Prototype database schema showing the core entities and relationships.}
     \label{fig:method-database-schema}
 \end{figure}
 
-\subsection{Cache Method}
+\subsection{Caching Approach}
 
-Redis is used as a cache and not as the source of truth \cite{redisDocs}. When a report is created, the reports service stores a cached copy using a key pattern based on the report ID. When a report is requested, the service can check Redis before reading from PostgreSQL. When the report is updated or deleted, the cache entry is refreshed or removed.
+Redis is used as a cache layer, not as the source of truth \cite{redisDocs}. The reports service writes a cached report entry after create/update operations and checks the cache before reading from PostgreSQL on lookups. When a report changes or is deleted, the corresponding cache entry is refreshed or removed. Cache scope is kept narrow on purpose to make invalidation behavior clear in a prototype setting.
 
-The cache scope is intentionally narrow. Report ownership, status, evidence, and location remain in PostgreSQL. Redis only provides a temporary lookup copy. This keeps invalidation understandable for the prototype.
+\section{Workflow Specification}
 
-\section{Workflow Design Method}
-
-The main workflow is citizen report creation. The citizen fills in category, description, administrative location, coordinates, urgency, severity, and optional image evidence. The mobile app sends the report as a multipart request. The API gateway authenticates the user, uploads evidence files to Cloudinary, and forwards the completed payload to the reports service through RabbitMQ. The reports service saves the report in PostgreSQL and creates or updates the Redis cache entry.
+Workflows were specified as sequences across the client, gateway, and internal services. The primary workflow is report creation. A citizen enters a description and location fields, optionally selects photo evidence, and submits the report from the mobile app. The gateway authenticates the request, uploads evidence to Cloudinary, and forwards the final payload to the reports service. The reports service persists the report and updates the cache.
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\linewidth,height=0.42\textheight,keepaspectratio]{images/figure3-6-report-class-diagram.png}
-    \caption{Class or module diagram for the report workflow.}
+    \caption{Core data structures used in the report workflow.}
     \label{fig:method-report-class}
 \end{figure}
 
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.9\linewidth,height=0.44\textheight,keepaspectratio]{images/figure3-7-create-report-sequence.png}
-    \caption{Sequence diagram for creating a VietFlood report.}
+    \caption{Sequence of steps from report submission to persistence and cache update.}
     \label{fig:method-create-report-sequence}
 \end{figure}
 
-\subsection{Evidence Handling Method}
+\subsection{Evidence Metadata Handling}
 
-Evidence images are not stored in PostgreSQL as raw files. The gateway uploads image buffers to Cloudinary under the report folder \cite{cloudinaryUploadDocs}. The reports service stores the returned URL, public ID, and resource type with the report. The URL is used by the mobile app and dashboard for display. The public ID is kept so related media can be removed when a report is deleted.
+Evidence images are uploaded to Cloudinary rather than stored directly in PostgreSQL \cite{cloudinaryUploadDocs}. The gateway performs the upload and forwards the resulting metadata to the reports service. Storing the Cloudinary public ID alongside the URL makes evidence cleanup possible when reports are deleted. Cloudinary credentials are provided through environment configuration so secrets are not stored in the repository.
 
-This method keeps the database focused on structured data while Cloudinary handles media storage and delivery. It also means media credentials must be provided through environment configuration instead of being written into the source code.
+\subsection{Review and Status Updates}
 
-\subsection{Status Review Method}
+Status review is implemented as an administrator-only workflow. Relief users can browse reports, but they do not change status in this thesis version. Administrators update status through the web dashboard; the update request is routed through the gateway to the reports service, which validates the transition, applies the update, and refreshes cached entries.
 
-Status review is handled as an administrator workflow. Relief users can read broader report information and use map-related screens, but verification and rejection are not part of the relief role in this thesis. The administrator dashboard sends status updates through the gateway. The reports service checks the existing report, merges new evidence metadata when needed, updates the status, and refreshes the cache entry.
+\section{Client Development Approach}
 
-\section{Client Application Method}
+\subsection{Mobile Client Design}
 
-\subsection{Mobile Application Method}
+The mobile client was developed with Expo React Native and TypeScript \cite{expoDocs,reactNativeDocs,typescriptDocs}. The method emphasizes short task completion: sign in, create a report, and view report history. Role-aware navigation is used to present citizen and relief flows without mixing privileged administrator operations into the mobile interface. Redux Toolkit is used to manage authentication state and client-side data flow \cite{reduxToolkitDocs}.
 
-The mobile app was developed with Expo React Native and TypeScript \cite{expoDocs,reactNativeDocs,typescriptDocs}. It supports token-based authentication, profile screens, report creation, report lists, relief report details, map screens, settings, localization, and role-aware navigation. Redux Toolkit supports application state around authentication and client-side data flow \cite{reduxToolkitDocs}.
+Location entry combines two sources. When permission is granted, the device can provide coordinates. Administrative divisions (province/ward) are selected from the Vietnam Provinces Open API to reduce spelling variation and improve consistency across reports \cite{vietnamProvincesOpenApi}.
 
-The mobile report service normalizes backend data before rendering it. This is needed because report fields may appear in different naming styles, such as snake case and camel case, or as \texttt{lat}/\texttt{lng} and \texttt{latitude}/\texttt{longitude}. The mobile location method also combines administrative division data from the Vietnam Provinces Open API with device location when permission is available \cite{vietnamProvincesOpenApi}.
+\subsection{Dashboard Design}
 
-\subsection{Web Dashboard Method}
+The web dashboard was developed with Next.js, React, TypeScript, and Tailwind CSS \cite{nextjsDocs,reactDocs,typescriptDocs,tailwindDocs}. It is designed around administrator tasks: triage, evidence inspection, status updates, and user management. The dashboard signs in through the gateway, stores tokens, refreshes sessions when needed, and checks the loaded profile before rendering administrator-only routes.
 
-The web dashboard was developed with Next.js, React, TypeScript, and Tailwind CSS \cite{nextjsDocs,reactDocs,typescriptDocs,tailwindDocs}. It is focused on administrator review. The dashboard signs in through the backend, stores access and refresh tokens, refreshes sessions when needed, loads the current profile, and blocks non-admin users from the admin workspace.
+After authentication, the dashboard loads report lists through the gateway and presents key fields (status, severity, location summary, description) and evidence thumbnails. Filters and search reduce the time required to find relevant cases when many reports arrive close together.
 
-After authentication, the dashboard loads report data from the gateway and displays report cards with status, category, severity, address, description, reporter information, and evidence thumbnails. It also provides search, filtering, user management, and status update controls.
+\section{Real-Time Channel Approach}
 
-\section{Real-Time Tracking Method}
+VietFlood includes a Socket.IO gateway for live location broadcasting \cite{socketioDocs}. A client can emit location updates containing latitude/longitude and optional motion fields. The gateway validates coordinate ranges before rebroadcasting updates to connected clients. Invalid payloads receive an error event. This is treated as a prototype capability to demonstrate real-time communication; operational use would require authentication, clearer authorization rules, and persistent history storage.
 
-The backend includes a Socket.IO gateway for live location updates \cite{socketioDocs}. A connected client can emit a location event with latitude, longitude, accuracy, heading, speed, and timestamp. The gateway checks latitude and longitude ranges before broadcasting the accepted location to other clients. Invalid payloads receive an error event. When a socket disconnects, the gateway announces the disconnected client.
+\section{Prototype Validation Strategy}
 
-This feature is treated as a prototype path. It proves that the backend can receive and broadcast live location data. Future work would still be needed for authenticated socket sessions, route assignment, persistent location history, and operational use in real relief coordination.
+Validation combines two checks: (1) responsibility checks at the code level and (2) scenario walkthroughs across the full stack. Docker Compose is used as the repeatable local environment for backend services and infrastructure dependencies \cite{dockerComposeDocs}.
 
-\section{Validation Method}
-
-Validation was performed through source-level checks and workflow checks. Source-level checks focused on whether each module matched its responsibility: the gateway handled client-facing access, the authentication service handled identity and tokens, the reports service handled report data, and the shared package handled reusable infrastructure. Docker Compose was used as the repeatable local environment for backend services and infrastructure dependencies \cite{dockerComposeDocs}.
-
-Workflow checks focused on the main paths of the prototype:
-
+Scenario walkthroughs focus on whether the prototype supports the intended workflows:
 \begin{itemize}
-    \item citizen registration, sign-in, and profile loading;
-    \item citizen report creation with category, address, coordinates, urgency, severity, and images;
-    \item evidence upload to Cloudinary and metadata storage in PostgreSQL;
-    \item report list loading for citizen, relief, and admin views;
-    \item administrator report status update through the web dashboard;
-    \item Redis cache creation, refresh, and deletion during report changes;
-    \item Docker Compose startup for backend services, Redis, and RabbitMQ.
+    \item account registration, sign-in, and profile loading;
+    \item report creation with location fields and optional photo evidence;
+    \item evidence upload and metadata storage;
+    \item report listing and detail viewing for citizen, relief, and admin roles;
+    \item administrator status updates and cache refresh behavior;
+    \item live tracking event broadcast and error handling.
 \end{itemize}
 
-This validation method matches the current stage of VietFlood. The system is a working prototype, not a certified emergency-response platform. The checks therefore focus on whether the main reporting, evidence, review, cache, and service-integration flows operate according to the design.
+These checks are appropriate for a prototype thesis project: they confirm that the system behaves as designed without claiming operational readiness for real disaster response.

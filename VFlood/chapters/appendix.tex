@@ -5,84 +5,182 @@
 \setlength{\intextsep}{0.6em}
 \setlength{\abovecaptionskip}{0.35em}
 \setlength{\belowcaptionskip}{0.2em}
-\lstset{aboveskip=0.45em,belowskip=0.45em}
+\lstset{
+  aboveskip=0.2em,
+  belowskip=0.2em,
+  frame=none,
+  numbers=none,
+  xleftmargin=0pt,
+  framexleftmargin=0pt,
+}
 
-\chapter{API Specifications}
+\chapter{API Reference and Sample Payloads}
 
-This appendix provides representative API response structures for the VietFlood system. Use recorded Postman responses or logged API traffic to replace placeholders where available.
+This appendix summarizes the VietFlood API gateway endpoints and provides representative JSON responses. Token strings, user identifiers, and media URLs are masked with placeholders.
 
-\section{Authentication API}
+\section{Endpoint Inventory}
+
+\begin{table}[H]
+\centering
+\caption{REST endpoints exposed by the VietFlood API gateway.}
+\label{tab:appendix-api-endpoints}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabularx}{\textwidth}{|l|p{4.6cm}|p{3.1cm}|X|}
+\hline
+\textbf{Method} & \textbf{Endpoint} & \textbf{Access} & \textbf{Description} \\
+\hline
+\multicolumn{4}{|l|}{\textbf{Authentication}} \\
+\hline
+POST & \url{/auth/register} & Public & Create a new user account. \\
+\hline
+POST & \url{/auth/sign_in} & Public & Authenticate and obtain access and refresh tokens. \\
+\hline
+POST & \url{/auth/refresh_token} & Refresh token & Issue a new access token and rotate the refresh token. \\
+\hline
+POST & \url{/auth/logout} & Public & Logout and revoke refresh token (if provided). \\
+\hline
+POST & \url{/auth/refresh} & Public & Refresh helper endpoint used by the gateway (payload passthrough). \\
+\hline
+GET & \url{/auth/profile} & JWT & Fetch the current user profile. \\
+\hline
+PUT & \url{/auth/update} & JWT & Update the current user's profile. \\
+\hline
+PUT & \url{/auth/update/user/:id} & JWT + Role (admin/relief) & Update a user profile by user id. \\
+\hline
+DELETE & \url{/auth/delete/:id} & JWT + Role (admin) & Delete a user by user id. \\
+\hline
+GET & \url{/auth/all} & JWT + Role (admin/relief) & List all users. \\
+\hline
+GET & \url{/auth/relief/users} & JWT + Role (admin/relief) & List users (alias of \url{/auth/all}). \\
+\hline
+GET & \url{/auth/relief/users/:id} & JWT + Role (admin/relief) & Fetch a user by user id. \\
+\hline
+\multicolumn{4}{|l|}{\textbf{Reports}} \\
+\hline
+POST & \url{/reports/create} & JWT & Create a new flood report (supports evidence file upload). \\
+\hline
+GET & \url{/reports} & JWT + Role (admin/relief) & Fetch all reports for admin/relief review. \\
+\hline
+GET & \url{/reports/user} & JWT + Role (citizen) & Fetch reports created by the current citizen user. \\
+\hline
+GET & \url{/reports/:id} & JWT + Role (admin/relief) & Fetch reports for a specific user id. \\
+\hline
+PUT & \url{/reports/update/:id} & JWT & Update a report owned by the current user (supports evidence upload). \\
+\hline
+PUT & \url{/reports/update/:id/admin/:userId} & JWT + Role (admin) & Update a report for a specific user id (admin workflow). \\
+\hline
+PUT & \url{/reports/relief/:id/user/:userId} & JWT + Role (admin/relief) & Update a report for a specific user id (relief workflow). \\
+\hline
+DELETE & \url{/reports/:id} & JWT & Delete a report owned by the current user. \\
+\hline
+DELETE & \url{/reports/update/:id/admin/:userId} & JWT + Role (admin) & Delete a report for a specific user id (admin workflow). \\
+\hline
+DELETE & \url{/reports/relief/:id/user/:userId} & JWT + Role (admin/relief) & Delete a report for a specific user id (relief workflow). \\
+\hline
+\end{tabularx}
+\end{table}
+
+\section{Authentication: Sign In}
 
 \textbf{Endpoint:} \texttt{POST /auth/sign\_in}
 
-\textbf{Response:}
+\textbf{Response body:}
 \begin{lstlisting}[language=JavaScript, caption=Sign In Response, label=lst:signin-response]
 {
-  "statusCode": 200,
-  "message": "Login successful",
-  "data": {
-    "accessToken": "<JWT_ACCESS_TOKEN>",
-    "refreshToken": "<JWT_REFRESH_TOKEN>",
-    "user": {
-      "id": "<uuid>",
-      "email": "<user_email>",
-      "role": "citizen"
-    }
-  }
+  "accessToken": "<JWT_ACCESS_TOKEN>",
+  "refresh_token": "<JWT_REFRESH_TOKEN>"
 }
 \end{lstlisting}
 
-\section{Report Creation API}
+\section{Authentication: Token Refresh}
 
-\textbf{Endpoint:} \texttt{POST /reports}
+\textbf{Endpoint:} \texttt{POST /auth/refresh\_token}
 
-\textbf{Response:}
+\textbf{Response body:}
+\begin{lstlisting}[language=JavaScript, caption=Refresh Token Response, label=lst:refresh-token-response]
+{
+  "access_token": "<JWT_ACCESS_TOKEN>",
+  "refresh_token": "<JWT_REFRESH_TOKEN>"
+}
+\end{lstlisting}
+
+\section{User: Profile Payload}
+
+\textbf{Endpoint:} \texttt{GET /auth/profile}
+
+\textbf{Response body:}
+\begin{lstlisting}[language=JavaScript, caption=User Profile Response, label=lst:profile-response]
+{
+  "id": 7,
+  "email": "<user_email>",
+  "username": "<username>",
+  "phone": "<phone_number>",
+  "role": "citizen",
+  "first_name": "<first_name>",
+  "middle_name": null,
+  "last_name": "<last_name>",
+  "date_of_birth": "2000-01-01",
+  "address_line": "<address_line>",
+  "ward": "<ward>",
+  "province": "<province>",
+  "created_at": "2026-05-17T00:00:00.000Z",
+  "updated_at": "2026-05-17T00:00:00.000Z"
+}
+\end{lstlisting}
+
+\section{Reports: Create Payload}
+
+\textbf{Endpoint:} \texttt{POST /reports/create}
+
+\textbf{Response body:}
 \begin{lstlisting}[language=JavaScript, caption=Create Report Response, label=lst:create-report-response]
 {
-  "statusCode": 201,
-  "message": "Report created successfully",
-  "data": {
-    "id": "<report_id>",
-    "category": ["flood"],
-    "description": "<description>",
-    "status": "pending",
-    "evidence": [
-      {
-        "url": "<cloudinary_url>",
-        "resourceType": "image"
-      }
-    ]
-  }
+  "success": true,
+  "message": "Create report successfully",
+  "reportId": 41,
+  "category": ["flood"],
+  "evidences": [
+    {
+      "url": "<CLOUDINARY_URL>",
+      "publicId": "<CLOUDINARY_PUBLIC_ID>",
+      "resourceType": "image"
+    }
+  ],
+  "images": [
+    "<CLOUDINARY_URL>"
+  ]
 }
 \end{lstlisting}
 
-\chapter{Interface Screenshots}
+\chapter{User Interface Snapshots}
 
 Key user interface screens are shown here. These images support the main report without repeating the implementation details.
 
 \FloatBarrier
-\section{Screenshots}
+\section{Mobile and Dashboard Screens}
 
 \begin{figure}[H]
     \centering
     \begin{minipage}[t]{0.30\linewidth}
         \centering
         \includegraphics[width=0.88\linewidth,keepaspectratio]{figure4-11-mobile-create-report.jpg}
-        \caption{Citizen report creation screen.}
+        \caption{Mobile report creation screen (citizen workflow).}
         \label{fig:appendix-citizen-create-report}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.30\linewidth}
         \centering
         \includegraphics[width=0.88\linewidth,keepaspectratio]{figure4-12-mobile-evidence-upload.jpg}
-        \caption{Evidence upload screen.}
+        \caption{Mobile evidence selection and upload screen.}
         \label{fig:appendix-mobile-evidence-upload}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.30\linewidth}
         \centering
         \includegraphics[width=0.88\linewidth,keepaspectratio]{figure4-13-relief-report-list.jpg}
-        \caption{Relief worker report list screen.}
+        \caption{Relief report list screen for browsing incoming records.}
         \label{fig:appendix-relief-report-list}
     \end{minipage}
     
@@ -90,82 +188,129 @@ Key user interface screens are shown here. These images support the main report 
     \begin{minipage}[t]{0.82\linewidth}
         \centering
         \includegraphics[width=\linewidth,keepaspectratio]{figure4-15-admin-dashboard-overview.jpg}
-        \caption{Admin dashboard overview.}
+        \caption{Administrator dashboard overview with report list and filters.}
         \label{fig:appendix-admin-dashboard}
     \end{minipage}
 \end{figure}
 \FloatBarrier
 
-\chapter{Test Cases}
+\chapter{Prototype Validation Checklist}
 
-This table summarizes the most important validation flows for the VietFlood prototype.
+This appendix lists system-level test cases used to validate the VietFlood prototype. The cases focus on end-to-end behavior through the API gateway, including authentication, role checks, report workflow, and evidence handling.
+
+\section{Auth and User Scenarios}
 
 \begin{table}[H]
 \centering
-\caption{Key VietFlood Test Cases}
-\label{tab:appendix-test-cases}
+\caption{Authentication and user management validation scenarios.}
+\label{tab:appendix-auth-test-cases}
 \renewcommand{\arraystretch}{1.15}
-\small
-\begin{tabularx}{\textwidth}{|p{3.2cm}|X|p{2.8cm}|}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{|p{2.0cm}|p{3.8cm}|X|p{3.2cm}|}
 \hline
-\textbf{Scenario} & \textbf{Expected Result} & \textbf{Status} \\
+\textbf{ID} & \textbf{Feature} & \textbf{Input / Steps (summary)} & \textbf{Expected Result} \\
 \hline
-User login & Access token and user profile are returned & To be completed \\
+AUTH-01 & Sign in success (\texttt{POST /auth/sign\_in}) & Provide valid \texttt{username} and \texttt{password}. & Response contains \texttt{accessToken} and \texttt{refresh\_token}. \\
 \hline
-Create report with evidence & Report saved and evidence links stored & To be completed \\
+AUTH-02 & Sign in failure & Provide valid username with incorrect password. & Request rejected with an authentication error (no token returned). \\
 \hline
-View user reports & Citizen can view own report list & To be completed \\
+AUTH-03 & Access protected route without JWT & Call \texttt{GET /auth/profile} without \texttt{Authorization: Bearer ...}. & Request rejected. \\
 \hline
-Admin verify/reject report & Report status updates correctly & To be completed \\
+AUTH-04 & Refresh token success (\texttt{POST /auth/refresh\_token}) & Send \texttt{refresh} value in the body containing a valid refresh token. & Response contains \texttt{access\_token} and a rotated \texttt{refresh\_token}. \\
 \hline
-Relief user views map & Map shows report locations and markers & To be completed \\
+AUTH-05 & Role enforcement & Call admin/relief-only routes (for example \texttt{GET /reports}) using a citizen JWT. & Request rejected due to insufficient role. \\
 \hline
-Refresh token flow & New access token issued without login & To be completed \\
+AUTH-06 & Admin user listing & Call \texttt{GET /auth/all} with an admin JWT. & Returns list of users with profile fields. \\
 \hline
 \end{tabularx}
 \end{table}
 
-\chapter{Deployment and Configuration}
-
-This chapter summarizes the deployment configuration groups used by VietFlood. Sensitive values are masked and should be provided through secure environment variables.
+\section{Report and Evidence Scenarios}
 
 \begin{table}[H]
 \centering
-\caption{Deployment Configuration Groups}
+\caption{Report workflow and evidence handling validation scenarios.}
+\label{tab:appendix-report-test-cases}
+\renewcommand{\arraystretch}{1.15}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{|p{2.0cm}|p{3.8cm}|X|p{3.2cm}|}
+\hline
+\textbf{ID} & \textbf{Feature} & \textbf{Input / Steps (summary)} & \textbf{Expected Result} \\
+\hline
+REP-01 & Create report with evidence (\texttt{POST /reports/create}) & Submit required fields (\texttt{description}, \texttt{province}, \texttt{ward}, \texttt{addressLine}) with \texttt{category[]} and 1--3 image files. & Response indicates success and returns \texttt{reportId}, \texttt{evidences} metadata, and \texttt{images[]} URLs. \\
+\hline
+REP-02 & Create report without evidence & Submit report payload with no files. & Report created; \texttt{evidences} and \texttt{images} are empty arrays. \\
+\hline
+REP-03 & Citizen fetches own reports (\texttt{GET /reports/user}) & Call as citizen with valid JWT. & Returns list of reports created by the current user. \\
+\hline
+REP-04 & Admin/relief fetches all reports (\texttt{GET /reports}) & Call as admin or relief user. & Returns list of report records for review. \\
+\hline
+REP-05 & Update report by owner (\texttt{PUT /reports/update/:id}) & Update an existing report id owned by the current user; optionally attach additional evidence files. & Returns success message and updated evidence list and image URLs. \\
+\hline
+REP-06 & Delete report by owner (\texttt{DELETE /reports/:id}) & Delete an existing report id owned by the current user. & Returns success confirmation; subsequent fetch does not include the deleted report. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\section{Tracking Scenarios (Socket.IO)}
+
+\begin{table}[H]
+\centering
+\caption{Socket.IO live tracking validation scenarios.}
+\label{tab:appendix-tracking-test-cases}
+\renewcommand{\arraystretch}{1.15}
+\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabularx}{\textwidth}{|p{2.0cm}|p{3.8cm}|X|p{3.2cm}|}
+\hline
+\textbf{ID} & \textbf{Event} & \textbf{Input / Steps (summary)} & \textbf{Expected Result} \\
+\hline
+TRK-01 & Broadcast valid location (\texttt{send-location}) & Connect a client and emit \texttt{send-location} with valid latitude/longitude ranges. & Server broadcasts \texttt{receive-location} containing the sender id and payload. \\
+\hline
+TRK-02 & Reject invalid payload & Emit \texttt{send-location} with missing or out-of-range coordinates. & Client receives \texttt{location-error} and location is not broadcast. \\
+\hline
+TRK-03 & Disconnect notification & Disconnect a client socket. & Server broadcasts \texttt{user-disconnected} with the socket id. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\chapter{Runtime Configuration Summary}
+
+This chapter summarizes the environment variables used to deploy VietFlood with Docker Compose. Values shown here are variable names and example formats only. Secret values are not included.
+
+\begin{table}[H]
+\centering
+\caption{Environment variable groups used for VietFlood deployment with Docker Compose.}
 \label{tab:deployment-config-groups}
-\footnotesize
-\renewcommand{\arraystretch}{1.2}
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
 \begin{tabularx}{\textwidth}{|p{2.6cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}p{4.2cm}|}
 \hline
 \textbf{Group} & \textbf{Example Variables} & \textbf{Notes} \\
 \hline
-Database & \texttt{POSTGRES\_HOST}\newline
-\texttt{POSTGRES\_PORT}\newline
-\texttt{POSTGRES\_DB}\newline
-\texttt{POSTGRES\_USER\_NAME}\newline
-\texttt{POSTGRES\_PASSWORD}\newline
-\texttt{DATABASE\_URL} & Stores PostgreSQL connection settings. Real values must be masked. \\
+Gateway & \texttt{API\_GATEWAY\_PORT}, \texttt{CORS\_ORIGINS} & HTTP port and allowed web origins for the gateway service. \\
 \hline
-JWT & \texttt{JWT\_SECRET}\newline
-\texttt{REFRESH\_SECRET} & Stores access-token and refresh-token secrets. \\
+Runtime & \texttt{NODE\_ENV} & Runtime mode used by the Node.js applications (for example, \texttt{production}). \\
 \hline
-RabbitMQ & \texttt{RABBITMQ\_DEFAULT\_USER}\newline
-\texttt{RABBITMQ\_DEFAULT\_PASS}\newline
-\texttt{RABBITMQ\_URL} & Stores message broker connection settings. \\
+Database & \texttt{DATABASE\_URL} & PostgreSQL connection string for the deployment database. \\
 \hline
-Redis & \texttt{REDIS\_HOST}\newline
-\texttt{REDIS\_PORT}\newline
-\texttt{REDIS\_PASSWORD}\newline
-\texttt{REDIS\_DB} & Stores cache service configuration. \\
+Message broker & \texttt{RABBITMQ\_DEFAULT\_USER}, \texttt{RABBITMQ\_DEFAULT\_PASS}, \texttt{RABBITMQ\_URL} & RabbitMQ credentials and connection URL used by the backend services. \\
 \hline
-Cloudinary & \texttt{CLOUDINARY\_CLOUD\_NAME}\newline
-\texttt{CLOUDINARY\_API\_KEY}\newline
-\texttt{CLOUDINARY\_API\_SECRET} & Stores media upload configuration. \\
+Cache & \texttt{REDIS\_HOST}, \texttt{REDIS\_PORT}, \texttt{REDIS\_PASSWORD}, \texttt{REDIS\_DB} & Redis connection details used for caching (host, port, password, database index). \\
+\hline
+Token signing & \texttt{JWT\_SECRET}, \texttt{REFRESH\_SECRET} & Secrets used to sign access tokens and refresh tokens. \\
+\hline
+Admin seed & \texttt{ADMIN\_EMAIL}, \texttt{ADMIN\_PASSWORD} & Initial administrator credentials used during seed/startup logic. \\
+\hline
+Cloudinary & \texttt{CLOUDINARY\_CLOUD\_NAME}, \texttt{CLOUDINARY\_API\_KEY}, \texttt{CLOUDINARY\_API\_SECRET} & Cloudinary credentials used for evidence upload and deletion. \\
 \hline
 \end{tabularx}
 \end{table}
 
-\section{Deployment Notes}
+\section{Operational Notes}
 
 \begin{itemize}
     \item Use masked values for secrets in the thesis and replace them with actual values in deployment.

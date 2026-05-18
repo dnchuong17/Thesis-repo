@@ -10,10 +10,42 @@ M.~Imran, C.~Castillo, F.~Diaz, and S.~Vieweg, ``Processing social media
   messages in mass emergency: A survey,'' {\em ACM Computing Surveys}, vol.~47,
   no.~4, pp.~67:1--67:38, 2015.
 
+\bibitem{nestjsDocs}
+{NestJS}, ``Nestjs documentation.'' \url{https://docs.nestjs.com/}, 2026.
+\newblock Accessed: 2026-05-17.
+
+\bibitem{typescriptDocs}
+{TypeScript}, ``Typescript documentation.''
+  \url{https://www.typescriptlang.org/docs/}, 2026.
+\newblock Accessed: 2026-05-17.
+
+\bibitem{expoDocs}
+{Expo}, ``Expo documentation.'' \url{https://docs.expo.dev/}, 2026.
+\newblock Accessed: 2026-05-17.
+
+\bibitem{reactNativeDocs}
+{Meta Open Source}, ``React native documentation: Getting started.''
+  \url{https://reactnative.dev/docs/getting-started}, 2026.
+\newblock Accessed: 2026-05-17.
+
+\bibitem{vietnamProvincesOpenApi}
+{Vietnam Open API}, ``Vietnam provinces open api.''
+  \url{https://provinces.open-api.vn/}, 2026.
+\newblock Accessed: 2026-05-17.
+
+\bibitem{cloudinaryUploadDocs}
+{Cloudinary}, ``Upload api reference.''
+  \url{https://cloudinary.com/documentation/image_upload_api_reference}, 2026.
+\newblock Accessed: 2026-05-17.
+
 \bibitem{fowlerLewis2014microservices}
 M.~Fowler and J.~Lewis, ``Microservices: A definition of this new architectural
   term.'' \url{https://martinfowler.com/articles/microservices.html}, 2014.
 \newblock Accessed: 2026-05-17.
+
+\bibitem{thones2015microservices}
+J.~Th{\"o}nes, ``Microservices,'' {\em IEEE Software}, vol.~32, no.~1, p.~116,
+  2015.
 
 \bibitem{dragoni2017microservices}
 N.~Dragoni, S.~Giallorenzo, A.~Lluch~Lafuente, M.~Mazzara, F.~Montesi,
@@ -21,13 +53,14 @@ N.~Dragoni, S.~Giallorenzo, A.~Lluch~Lafuente, M.~Mazzara, F.~Montesi,
   tomorrow,'' in {\em Present and Ulterior Software Engineering}, pp.~195--216,
   Springer International Publishing, 2017.
 
-\bibitem{thones2015microservices}
-J.~Th{\"o}nes, ``Microservices,'' {\em IEEE Software}, vol.~32, no.~1, p.~116,
-  2015.
+\bibitem{nestjsMicroservicesDocs}
+{NestJS}, ``Nestjs microservices documentation.''
+  \url{https://docs.nestjs.com/microservices/basics}, 2026.
+\newblock Accessed: 2026-05-17.
 
-\bibitem{jones2015jwt}
-M.~B. Jones, J.~Bradley, and N.~Sakimura, ``Json web token (jwt),'' RFC 7519,
-  Internet Engineering Task Force, 2015.
+\bibitem{rabbitmqConfirmsDocs}
+{RabbitMQ}, ``Consumer acknowledgements and publisher confirms.''
+  \url{https://www.rabbitmq.com/docs/3.13/confirms}, 2026.
 \newblock Accessed: 2026-05-17.
 
 \bibitem{typeormDocs}
@@ -41,22 +74,13 @@ M.~B. Jones, J.~Bradley, and N.~Sakimura, ``Json web token (jwt),'' RFC 7519,
   2026.
 \newblock Accessed: 2026-05-17.
 
-\bibitem{cloudinaryUploadDocs}
-{Cloudinary}, ``Upload api reference.''
-  \url{https://cloudinary.com/documentation/image_upload_api_reference}, 2026.
+\bibitem{redisDocs}
+{Redis}, ``Redis documentation.'' \url{https://redis.io/docs/latest/}, 2026.
 \newblock Accessed: 2026-05-17.
 
-\bibitem{expoDocs}
-{Expo}, ``Expo documentation.'' \url{https://docs.expo.dev/}, 2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{reactNativeDocs}
-{Meta Open Source}, ``React native documentation: Getting started.''
-  \url{https://reactnative.dev/docs/getting-started}, 2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{nextjsDocs}
-{Vercel}, ``Next.js documentation.'' \url{https://nextjs.org/docs}, 2026.
+\bibitem{socketioDocs}
+{Socket.IO}, ``Socket.io documentation.'' \url{https://socket.io/docs/v4/},
+  2026.
 \newblock Accessed: 2026-05-17.
 
 \bibitem{dockerComposeDocs}
@@ -64,16 +88,44 @@ M.~B. Jones, J.~Bradley, and N.~Sakimura, ``Json web token (jwt),'' RFC 7519,
   \url{https://docs.docker.com/compose/}, 2026.
 \newblock Accessed: 2026-05-17.
 
-\bibitem{githubActionsDocs}
-{GitHub}, ``Github actions documentation.''
-  \url{https://docs.github.com/en/actions/}, 2026.
-\newblock Accessed: 2026-05-17.
-
 \bibitem{azureAppServiceContainersDocs}
 {Microsoft}, ``Continuous deployment with custom containers in azure app
   service.''
   \url{https://learn.microsoft.com/en-us/azure/app-service/deploy-ci-cd-custom-container},
   2026.
+\newblock Accessed: 2026-05-17.
+
+\bibitem{githubActionsDocs}
+{GitHub}, ``Github actions documentation.''
+  \url{https://docs.github.com/en/actions/}, 2026.
+\newblock Accessed: 2026-05-17.
+
+\bibitem{nextjsDocs}
+{Vercel}, ``Next.js documentation.'' \url{https://nextjs.org/docs}, 2026.
+\newblock Accessed: 2026-05-17.
+
+\bibitem{reactDocs}
+{React}, ``React documentation.'' \url{https://react.dev/}, 2026.
+\newblock Accessed: 2026-05-17.
+
+\bibitem{tailwindDocs}
+{Tailwind Labs}, ``Tailwind css documentation.''
+  \url{https://tailwindcss.com/docs}, 2026.
+\newblock Accessed: 2026-05-17.
+
+\bibitem{bass2021softwareArchitecture}
+L.~Bass, P.~Clements, and R.~Kazman, {\em Software Architecture in Practice}.
+\newblock Addison-Wesley Professional, 4~ed., 2021.
+
+\bibitem{provos1999bcrypt}
+N.~Provos and D.~Mazi{\`e}res, ``A future-adaptable password scheme,'' in {\em
+  1999 USENIX Annual Technical Conference}, (Monterey, California), USENIX
+  Association, June 1999.
+\newblock Accessed: 2026-05-17.
+
+\bibitem{jones2015jwt}
+M.~B. Jones, J.~Bradley, and N.~Sakimura, ``Json web token (jwt),'' RFC 7519,
+  Internet Engineering Task Force, 2015.
 \newblock Accessed: 2026-05-17.
 
 \bibitem{humble2010continuousDelivery}
@@ -87,61 +139,9 @@ G.~Kim, P.~Debois, J.~Willis, and J.~Humble, {\em The DevOps Handbook: How to
   Organizations}.
 \newblock IT Revolution Press, 2016.
 
-\bibitem{nestjsDocs}
-{NestJS}, ``Nestjs documentation.'' \url{https://docs.nestjs.com/}, 2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{nestjsMicroservicesDocs}
-{NestJS}, ``Nestjs microservices documentation.''
-  \url{https://docs.nestjs.com/microservices/basics}, 2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{rabbitmqConfirmsDocs}
-{RabbitMQ}, ``Consumer acknowledgements and publisher confirms.''
-  \url{https://www.rabbitmq.com/docs/3.13/confirms}, 2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{redisDocs}
-{Redis}, ``Redis documentation.'' \url{https://redis.io/docs/latest/}, 2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{vietnamProvincesOpenApi}
-{Vietnam Open API}, ``Vietnam provinces open api.''
-  \url{https://provinces.open-api.vn/}, 2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{bass2021softwareArchitecture}
-L.~Bass, P.~Clements, and R.~Kazman, {\em Software Architecture in Practice}.
-\newblock Addison-Wesley Professional, 4~ed., 2021.
-
-\bibitem{provos1999bcrypt}
-N.~Provos and D.~Mazi{\`e}res, ``A future-adaptable password scheme,'' in {\em
-  1999 USENIX Annual Technical Conference}, (Monterey, California), USENIX
-  Association, June 1999.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{socketioDocs}
-{Socket.IO}, ``Socket.io documentation.'' \url{https://socket.io/docs/v4/},
-  2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{typescriptDocs}
-{TypeScript}, ``Typescript documentation.''
-  \url{https://www.typescriptlang.org/docs/}, 2026.
-\newblock Accessed: 2026-05-17.
-
 \bibitem{reduxToolkitDocs}
 {Redux Toolkit}, ``Redux toolkit documentation.''
   \url{https://redux-toolkit.js.org/}, 2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{reactDocs}
-{React}, ``React documentation.'' \url{https://react.dev/}, 2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{tailwindDocs}
-{Tailwind Labs}, ``Tailwind css documentation.''
-  \url{https://tailwindcss.com/docs}, 2026.
 \newblock Accessed: 2026-05-17.
 
 \end{thebibliography}

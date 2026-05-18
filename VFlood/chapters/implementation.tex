@@ -26,305 +26,248 @@
 \end{figure}
 }
 
-This chapter explains how the VietFlood prototype was implemented. The work includes the backend services, mobile application, web dashboard, shared library, deployment process, and user management. The main goal was to make a working prototype that can receive flood reports from citizens, store them in the backend, and allow administrators or relief users to view the information.
+This chapter describes the implementation of the VietFlood prototype and the concrete outputs produced by the project. The system was implemented to support a complete reporting loop: users authenticate, citizens submit a report with location and optional evidence, the backend stores and serves that report through a stable API, and administrators review and update report status.
 
-The system is separated into four parts. The backend uses NestJS and contains the API gateway, authentication service, reports service, message queues, cache, media upload, and live tracking gateway. The mobile app supports citizen reporting and relief viewing. The web dashboard supports administrator review. The shared package keeps common code such as logging, Redis, and Cloudinary helpers.
+The implementation is delivered as four main artifacts: (1) a backend composed of an API gateway, an authentication service, and a reports service; (2) a mobile application for citizen and relief users; (3) a web dashboard for administrators; and (4) a shared library, \texttt{vietflood\_common}, that provides reusable infrastructure across services.
 
-\section{Technique and Tools}
+\section{Prototype Deliverables and Technology Stack}
 
-VietFlood was built as a multi-platform system. The backend uses NestJS and TypeScript \cite{nestjsDocs,typescriptDocs}. The mobile app uses Expo React Native \cite{expoDocs,reactNativeDocs}. The web dashboard uses Next.js \cite{nextjsDocs}. These tools were chosen because they all work well with TypeScript, but each platform can still be developed and deployed separately.
+TypeScript is used across the backend and both client applications to keep models, validation rules, and data contracts consistent during development. The backend services are built with NestJS \cite{nestjsDocs} and use NestJS microservice support to communicate through a message broker \cite{nestjsMicroservicesDocs}. The mobile application is built with Expo React Native \cite{expoDocs,reactNativeDocs}, and the web dashboard is built with Next.js \cite{nextjsDocs}.
 
-\noindent\textbf{a) Version Control and Build Tools:} The source code is managed with Git. The backend is arranged as a NestJS workspace with the API gateway, auth service, and reports service. Each backend app has a Dockerfile. Docker Compose starts the backend services with RabbitMQ and Redis for local development \cite{dockerComposeDocs}. For deployment, Docker images are built and run on Azure App Service \cite{azureAppServiceContainersDocs}.
-
-\noindent\textbf{b) Front-end Development:} The mobile app uses Expo, React Native, TypeScript, React Navigation, Redux Toolkit, SecureStore, image picker, and device location \cite{expoDocs,reactNativeDocs,typescriptDocs,reduxToolkitDocs}. These tools support login, profile, report creation, evidence upload, and relief report viewing. The web dashboard uses Next.js, React, TypeScript, and Tailwind CSS \cite{nextjsDocs,reactDocs,typescriptDocs,tailwindDocs}. It allows administrators to filter reports, preview evidence, and update report status.
-
-\noindent\textbf{c) Back-end Development:} The backend follows a microservice style with NestJS microservice support \cite{nestjsMicroservicesDocs}. The API gateway exposes REST endpoints and Socket.IO events \cite{socketioDocs}. The auth service handles registration, login, refresh tokens, profile data, logout, and user administration. The reports service handles report creation, report reading, report update, report deletion, evidence metadata, and cache refresh.
-
-\noindent\textbf{d) Database and Media Storage:} PostgreSQL stores users, refresh tokens, and reports. TypeORM maps database tables to service entities \cite{typeormDocs}. Redis stores report cache records \cite{redisDocs}. Cloudinary stores evidence files \cite{cloudinaryUploadDocs}. The database stores only media metadata, such as URL, public ID, and resource type. JSONB is used for flexible evidence data \cite{postgresqlJsonDocs}.
-
-\noindent\textbf{e) Cloud Service and Runtime Configuration:} The deployed backend runs on Azure App Service. Secrets are not written in the source code. Database URL, Redis settings, RabbitMQ credentials, JWT secrets, refresh-token secret, Cloudinary credentials, and admin seed values are passed through environment variables.
+The prototype is designed to run as containers. Docker Compose is used for local development to start the gateway, services, RabbitMQ, and Redis in a repeatable environment \cite{dockerComposeDocs}. For deployment, container images are deployed to Azure App Service \cite{azureAppServiceContainersDocs}, and build/deploy automation is handled through GitHub Actions \cite{githubActionsDocs}. Sensitive values (database URL, JWT secrets, Cloudinary credentials, broker credentials) are provided through environment variables rather than stored in source code.
 
 \begin{table}[!htbp]
     \centering
-    \caption{Main implementation tools used in VietFlood.}
+    \caption{Implementation technologies used in the VietFlood prototype.}
     \setlength{\tabcolsep}{8pt}
     \renewcommand{\arraystretch}{1.18}
     \small
-    \begin{tabular}{|p{3.1cm}|p{9.4cm}|}
+    \begin{tabular}{|p{3.2cm}|p{9.3cm}|}
         \hline
-        \textbf{Area} & \textbf{Tools and implementation use} \\
+        \textbf{Component} & \textbf{Implementation choices} \\
         \hline
-        Backend & NestJS, TypeScript, TypeORM, RabbitMQ, Socket.IO, JWT, bcrypt, and Docker. \\
+        Backend & NestJS services, TypeORM persistence, RabbitMQ messaging, Redis cache, JWT authentication. \\
         \hline
-        Shared library & \texttt{vietflood\_common} for logging, Redis access, and Cloudinary operations. \\
+        Shared library & \texttt{vietflood\_common} for logging, Redis helpers, and Cloudinary upload utilities. \\
         \hline
-        Database and cache & PostgreSQL for stored data and Redis for report cache entries. \\
+        Evidence storage & Cloudinary for media uploads and public delivery URLs. \\
         \hline
-        Media storage & Cloudinary for report evidence and generated media URLs. \\
+        Mobile application & Expo React Native, secure token storage, image picker, and location services. \\
         \hline
-        Mobile app & Expo, React Native, React Navigation, Redux Toolkit, SecureStore, image picker, and device location. \\
+        Web dashboard & Next.js, role-based routes, report review UI, and admin status updates. \\
         \hline
-        Web dashboard & Next.js, React, TypeScript, Tailwind CSS, token storage, and admin report review. \\
-        \hline
-        Deployment & Docker Compose, Docker Hub, GitHub Actions, and Azure App Service. \\
+        Deployment & Docker Compose for local runtime, GitHub Actions automation, Azure App Service containers. \\
         \hline
     \end{tabular}
     \label{tab:vietflood-implementation-tools}
 \end{table}
 
-\section{Messaging Broker Implementation}
+\section{Backend Implementation}
 
-RabbitMQ is used between the API gateway and the internal backend services \cite{rabbitmqConfirmsDocs,nestjsMicroservicesDocs}. The gateway receives HTTP requests from the mobile app or web dashboard. Then it sends a message to the service that owns the business logic. The auth service listens on \texttt{auth\_queue}. The reports service listens on \texttt{reports\_queue}.
+\subsection{Service Responsibilities and Routing}
 
-The gateway does not directly run authentication or report logic. It sends message patterns for registration, sign in, profile loading, refresh, logout, report creation, report listing, update, and delete. This makes the gateway a transport layer, while each service keeps its own data rules.
-
-Gateway calls use timeout and retry rules. Upload requests are given more time because they may upload files to Cloudinary. Small requests use shorter limits. If a service fails, the gateway returns a controlled HTTP response instead of making the client wait too long.
+The API gateway is the only backend component exposed to clients. It receives HTTP requests (including multipart uploads), validates access using guards, and forwards internal work to the authentication or reports service. Internal communication uses RabbitMQ request--response message patterns \cite{rabbitmqConfirmsDocs,nestjsMicroservicesDocs}. This layout keeps transport and access control in one place, while moving business logic and database operations into dedicated services.
 
 \begin{table}[!htbp]
     \centering
-    \caption{Comparison of message brokers for the VietFlood backend.}
+    \caption{Responsibility split across backend services in VietFlood.}
+    \footnotesize
     \setlength{\tabcolsep}{5pt}
     \renewcommand{\arraystretch}{1.2}
-    \footnotesize
-    \begin{tabular}{|p{2.8cm}|p{3.25cm}|p{3.25cm}|p{3.25cm}|}
+    \begin{tabular}{|p{3.0cm}|p{9.4cm}|}
         \hline
-        \textbf{Criteria} & \textbf{RabbitMQ} & \textbf{Redis Pub/Sub} & \textbf{Kafka} \\
+        \textbf{Service} & \textbf{Main responsibilities} \\
         \hline
-        Request-response work & Good for gateway commands, queues, and acknowledgements. & Fast, but weaker for durable command handling. & Powerful, but too heavy for this prototype. \\
+        API gateway & Public REST routes, file parsing for uploads, JWT and role guards, and routing requests to internal services. \\
         \hline
-        Operational cost & Simple to run locally with the backend services. & Simple, but already used as cache in VietFlood. & Needs more setup and topic management. \\
+        Auth service & User registration, password validation, token issuance, refresh token rotation, and user management. \\
         \hline
-        VietFlood usage & Used for auth and report service communication. & Used separately as the report cache layer. & Not used in the current system. \\
+        Reports service & Report persistence, evidence metadata storage, report listing and filtering, status updates, and cache invalidation. \\
         \hline
     \end{tabular}
-    \label{tab:vietflood-broker-comparison}
+    \label{tab:vietflood-service-roles}
 \end{table}
 
 \vfplaceholderfigure
     {figure4-1-rabbitmq-communication-flow.png}
     {0.74}
     {0.28}
-    {RabbitMQ communication flow between the API gateway, auth service, reports service, auth queue, and reports queue.}
+    {RabbitMQ message routing between the API gateway and internal services.}
     {fig:vietflood-rabbitmq-flow}
 
 \FloatBarrier
-\section{Authentication and Authorization Implementation}
+\subsection{Authentication, Tokens, and Role Checks}
 
-VietFlood uses username and password login. Passwords are hashed with bcrypt before saving \cite{provos1999bcrypt}. After login, the auth service creates an access token and a refresh token. The access token uses the JSON Web Token format \cite{jones2015jwt}. It stores the user ID, username, role, first name, and last name. The gateway uses this data for protected routes.
+VietFlood uses password-based authentication. Passwords are hashed with bcrypt before storage \cite{provos1999bcrypt}. After login, the authentication service issues an access token and refresh token. Access tokens are JSON Web Tokens that carry identity and role claims needed by the gateway authorization guards \cite{jones2015jwt}. Refresh tokens are stored and rotated to support longer-lived sessions while limiting the impact of token leakage.
 
-\subsection{Authentication Mechanism Implementation}
-
-\noindent\textbf{a) Registration Process}
-
-Registration is handled by the auth service. The service checks if the email, username, or phone number is already used. If one of them exists, the request is rejected. If the data is valid, the password is hashed with bcrypt and the new user is saved in the \texttt{users} table. The backend returns only a small success response, not the password hash.
-
-\noindent\textbf{b) Login Process}
-
-Login uses the \texttt{/auth/sign\_in} endpoint. The auth service finds the user by username and compares the password with the stored bcrypt hash. If the password is correct, it returns an access token and a refresh token. On mobile, users can choose saved login or session-only login. On the web dashboard, the app loads the current profile before showing admin pages.
+The prototype supports three roles: \texttt{citizen}, \texttt{relief}, and \texttt{admin}. Role checks are enforced at the gateway for protected endpoints and admin-only routes. This is a simple model, but it is sufficient to demonstrate the different responsibilities: citizens submit reports, relief users browse and monitor, and administrators review and change status.
 
 \begin{figure}[!htbp]
     \centering
     \begin{minipage}[t]{0.31\linewidth}
         \centering
         \includegraphics[width=0.88\linewidth,height=0.27\textheight,keepaspectratio]{images/figure4-2-mobile-registration.jpg}
-        \caption{Citizen registration screen in the VietFlood mobile app.}
+        \caption{Mobile registration view used to create a citizen account.}
         \label{fig:vietflood-mobile-registration}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.31\linewidth}
         \centering
         \includegraphics[width=0.88\linewidth,height=0.27\textheight,keepaspectratio]{images/figure4-3-mobile-login.jpg}
-        \caption{Citizen login screen in the VietFlood mobile app.}
+        \caption{Mobile sign-in view that returns access and refresh tokens.}
         \label{fig:vietflood-mobile-login}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.31\linewidth}
         \centering
         \includegraphics[width=\linewidth,height=0.27\textheight,keepaspectratio]{images/figure4-4-web-admin-login.jpg}
-        \caption{Admin login page in the VietFlood web dashboard.}
+        \caption{Administrator sign-in view in the web dashboard.}
         \label{fig:vietflood-web-login}
     \end{minipage}
 \end{figure}
-\FloatBarrier
-
-\subsection{Refresh Token Implementation}
-
-Refresh tokens are stored as hashed values in the \texttt{refresh\_tokens} table. Each token belongs to one user and has expiration and revocation data. When a user signs in again, the service can update the existing token row instead of creating too many active tokens.
-
-The refresh endpoint lets the mobile app and web dashboard request a new access token without logging in again. On mobile, the token helper keeps the same storage choice as login. If the user selected saved login, the new token is stored in SecureStore. If the user selected session-only login, the token stays in memory.
 
 \vfplaceholderfigure
     {figure4-6-token-refresh-flow.png}
-    {0.72}
-    {0.25}
-    {Refresh-token flow from mobile or web client through the API gateway, auth service, refresh-token table, and new access token response.}
+    {0.74}
+    {0.26}
+    {Refresh token rotation sequence for renewing access tokens and invalidating old refresh tokens.}
     {fig:vietflood-refresh-token-flow}
 
-\subsection{Authorization Process Implementation}
-
-Authorization is checked at the API gateway. JWT guards validate the token. Role guards check if the route is allowed for a citizen, relief user, or administrator. Citizens can create and manage their own reports. Relief users can read reports and view locations. Administrators can review evidence, update report status, and manage users.
-
-This role separation is important. Relief users do not verify or reject reports in the current prototype. Verification, rejection, and resolution stay as administrator actions.
-
 \FloatBarrier
-\section{Report Processing and Evidence Upload Implementation}
+\subsection{Report Handling and Evidence Pipeline}
 
-Report creation starts in the mobile app. A citizen fills in category, description, address, coordinates, urgency, severity, and optional evidence images. The app sends the data as multipart form data, so text fields and image files are sent in one request.
+Flood reports are created from the mobile client and received by the gateway as multipart form data. When evidence images are present, the gateway uploads files to Cloudinary and produces a metadata list (delivery URL, public ID, and resource type) \cite{cloudinaryUploadDocs}. The final payload is then sent to the reports service through RabbitMQ. The reports service validates the payload, persists the report using TypeORM \cite{typeormDocs}, and writes a cache entry in Redis for faster follow-up lookups \cite{redisDocs}.
 
-The API gateway receives the files and uploads them to Cloudinary \cite{cloudinaryUploadDocs}. After that, it sends the report payload and evidence metadata to the reports service through RabbitMQ. The reports service saves the report in PostgreSQL. Category values are stored as arrays, and evidence is stored as JSONB with URL, public ID, and resource type \cite{postgresqlJsonDocs}. After saving, the service writes a Redis cache entry \cite{redisDocs}.
+This evidence-first pipeline keeps the database focused on structured report fields while still making evidence available for review. It also makes the report record self-contained: administrators can review a report by reading one database row plus its evidence metadata, without needing local file storage.
 
 \vfplaceholderfigure
     {figure4-7-report-processing-flow.png}
-    {0.76}
-    {0.27}
-    {Report creation flow from mobile form submission to Cloudinary upload, RabbitMQ message, PostgreSQL insert, and Redis cache write.}
+    {0.74}
+    {0.26}
+    {End-to-end report handling pipeline from submission to persistence and cache refresh.}
     {fig:vietflood-report-processing-flow}
 
-\subsection{Report Update and Delete Implementation}
+Update and delete operations follow the same service boundary. The gateway enforces role permissions, then forwards update/delete commands to the reports service. When a report changes, the reports service invalidates and refreshes cache entries so that subsequent reads reflect the current state.
 
-Report update uses the same upload path as report creation. If a citizen adds new evidence, the gateway uploads the new files to Cloudinary. The reports service checks report ownership, merges new evidence with old evidence, updates image URLs, deletes the old Redis cache entry, and writes a new cache entry.
+\FloatBarrier
+\subsection{Shared Infrastructure Utilities}
 
-Report deletion also checks ownership. The reports service reads Cloudinary public IDs from the stored evidence metadata and deletes the media when it exists. Then it deletes the report row from PostgreSQL and removes the Redis cache key.
-
-\section{Public Library Implementation}
-
-The shared backend package is named \texttt{vietflood\_common}. It contains reusable services for logging, Redis, and Cloudinary. This package helps the gateway, auth service, and reports service avoid repeating the same infrastructure code.
-
-The Cloudinary helper supports buffer upload, file-path upload, base64 upload, single delete, bulk delete, rename, optimized image URL generation, and raw URL generation. In the report workflow, the gateway uses buffer upload for evidence files. The reports service uses bulk delete when a report is removed.
-
-The Redis helper wraps common operations such as \texttt{set}, \texttt{get}, \texttt{del}, and \texttt{publish} \cite{redisDocs}. The logger service adds service names and request context to logs. This makes backend behavior easier to trace when many services run together.
+To keep services small and consistent, VietFlood includes a shared library, \texttt{vietflood\_common}, that exposes a logging module and small wrappers for Redis and Cloudinary. Centralizing these utilities reduces duplicated code and makes it easier to apply consistent error handling and configuration across services.
 
 \vfplaceholderfigure
     {figure4-8-common-library-structure.png}
     {0.72}
     {0.25}
-    {Shared common library structure showing LoggerService, RedisService, CloudinaryService, and the backend modules that import them.}
+    {Structure of the shared utilities package used by backend services (logging, Redis, Cloudinary).}
     {fig:vietflood-common-library}
 
-\section{Real-Time Tracking Implementation}
+\FloatBarrier
+\subsection{Live Location Event Channel}
 
-VietFlood includes a Socket.IO gateway for live location sharing \cite{socketioDocs}. The client sends latitude, longitude, accuracy, heading, speed, and timestamp. The gateway checks latitude and longitude before broadcasting. Invalid coordinates return an error to the sender. Valid coordinates are sent to connected clients.
-
-The gateway also handles connection and disconnection events. When a client disconnects, other clients can be informed. This feature is useful for relief work because a relief screen can receive a user's latest location. In this prototype, the feature proves the live communication path. Authenticated sockets and stored location history can be added later.
+The prototype includes a Socket.IO gateway used for live location broadcasting \cite{socketioDocs}. Clients emit \texttt{send-location} events with latitude and longitude values. The gateway validates coordinate ranges and rebroadcasts valid updates to other connected clients using a \texttt{receive-location} event. Invalid payloads result in a \texttt{location-error} response to the sender. This feature demonstrates real-time event flow and can be extended with authenticated identities and persistence if needed for operational use.
 
 \vfplaceholderfigure
     {figure4-9-live-tracking-flow.png}
     {0.72}
     {0.25}
-    {Socket.IO live tracking flow with send-location, receive-location, location-error, and user-disconnected events.}
+    {Socket.IO location event flow including validation, broadcast, and error responses.}
     {fig:vietflood-live-tracking-flow}
 
 \FloatBarrier
-\section{Mobile Citizen Feature Implementation}
+\section{Client-Side Implementation}
 
-\subsection{Report List and Profile Access}
+\subsection{Mobile Application Features}
 
-The mobile app provides the main citizen workflow after login. It loads the user profile through an authenticated endpoint. It also loads reports through the report service wrapper. The wrapper normalizes backend data because some fields may use different names between backend and client models.
+The mobile application is the field-facing interface and is designed for quick submission and reading. After sign-in, the app loads the current profile and displays a report list for the user. Citizens can create a report by providing a category, short description, administrative address fields, and coordinates. Evidence images are selected from the device and uploaded as part of the create report request.
 
-The citizen report list shows submitted reports with status, category, location, and evidence information. Status labels are normalized before display. This makes the interface more stable while the prototype is still changing.
-
-\subsection{Create Report Implementation}
-
-The create-report screen collects category, description, address, latitude, longitude, urgency, severity, and evidence images. Province and ward selection uses data from the Vietnam Provinces Open API \cite{vietnamProvincesOpenApi}. If the user allows location permission, the app can fill coordinate values from the device.
+The relief role focuses on browsing and map-oriented views. Relief users can open report lists and inspect report details, but they do not change report status in this prototype. That separation avoids conflicting status changes and keeps the verification decision inside the administrator workflow.
 
 \begin{figure}[!htbp]
     \centering
     \begin{minipage}[t]{0.31\linewidth}
         \centering
         \includegraphics[width=0.88\linewidth,height=0.27\textheight,keepaspectratio]{images/figure4-10-mobile-report-list.jpg}
-        \caption{Citizen report list or citizen home screen showing submitted reports, status labels, and report location information.}
+        \caption{Citizen report list showing submissions and current status values.}
         \label{fig:vietflood-mobile-report-list}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.31\linewidth}
         \centering
         \includegraphics[width=0.88\linewidth,height=0.27\textheight,keepaspectratio]{images/figure4-11-mobile-create-report.jpg}
-        \caption{Create report form in the VietFlood mobile app.}
+        \caption{Report creation form used to enter description and location fields.}
         \label{fig:vietflood-mobile-create-report}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.31\linewidth}
         \centering
         \includegraphics[width=0.88\linewidth,height=0.27\textheight,keepaspectratio]{images/figure4-12-mobile-evidence-upload.jpg}
-        \caption{Evidence upload in the VietFlood mobile app.}
+        \caption{Evidence selection and upload workflow on the mobile client.}
         \label{fig:vietflood-mobile-evidence-upload}
     \end{minipage}
 \end{figure}
-
-\FloatBarrier
-\section{Relief Feature Implementation}
-
-The relief side of the mobile app is used for reading and locating flood reports. The relief report list shows submitted cases. The detail view shows description, category, address, evidence, and current status. The map screen helps relief users understand report locations.
-
-The relief role is narrower than the administrator role. Relief users can view reports and map information, but they cannot verify, reject, or resolve reports. This keeps report approval under administrator control.
 
 \begin{figure}[!htbp]
     \centering
     \begin{minipage}[t]{0.44\linewidth}
         \centering
         \includegraphics[width=0.72\linewidth,height=0.28\textheight,keepaspectratio]{images/figure4-13-relief-report-list.jpg}
-        \caption{Relief report list in the mobile app.}
+        \caption{Relief list view for browsing broader report records.}
         \label{fig:vietflood-relief-report-list}
     \end{minipage}
     \hfill
     \begin{minipage}[t]{0.44\linewidth}
         \centering
         \includegraphics[width=0.72\linewidth,height=0.28\textheight,keepaspectratio]{images/figure4-14-relief-map.jpg}
-        \caption{Relief map screen in the mobile app.}
+        \caption{Relief map view for locating reports spatially.}
         \label{fig:vietflood-relief-map}
     \end{minipage}
 \end{figure}
 
 \FloatBarrier
-\section{Web Dashboard Implementation}
+\subsection{Administrator Dashboard Features}
 
-The web dashboard is the administrator workspace. It starts with admin login, stores the returned tokens, and loads the current profile before showing protected pages. The dashboard loads report records from the backend, formats dates, translates category and status values, extracts evidence thumbnails, and shows reporter information when available.
-
-The dashboard has search and status filtering. Search can match reporter name, account name, phone number, location, and description. Status filtering supports pending, verified, resolved, and rejected states. Status controls call the admin report update route through the API gateway.
+The web dashboard is used for report review and user management. After login, it loads the current profile and blocks routes that require administrator access. Administrators can list incoming reports, filter by status, inspect evidence thumbnails, and update status values such as \texttt{pending}, \texttt{verified}, \texttt{resolved}, and \texttt{rejected}. Status changes are sent to the gateway and forwarded to the reports service through RabbitMQ so the database and cache remain consistent.
 
 \vfplaceholderfigure
     {figure4-15-admin-dashboard-overview.jpg}
     {0.82}
     {0.27}
-    {Admin dashboard overview with report statistics, search, status filters, report cards, and evidence thumbnails.}
+    {Administrator dashboard overview with report cards, filters, and evidence thumbnails.}
     {fig:vietflood-admin-dashboard-overview}
-
-\subsection{Evidence Review and Status Update}
-
-Evidence review uses the Cloudinary URLs stored with the report. The dashboard first checks the evidence list and then falls back to the image list. This makes the dashboard work with reports created by different client versions. When the administrator changes report status, the dashboard sends the update to the gateway, and the gateway forwards it to the reports service through RabbitMQ.
 
 \vfplaceholderfigure
     {figure4-16-admin-evidence-status-update.jpg}
     {0.82}
     {0.29}
-    {Admin evidence review and status update screen for pending, verified, resolved, and rejected reports.}
+    {Evidence review and status update screen used by administrators.}
     {fig:vietflood-admin-evidence-status}
 
 \FloatBarrier
-\section{Deployment Implementation}
+\section{Deployment and Release Automation}
 
-Backend deployment uses Docker images and Azure App Service \cite{azureAppServiceContainersDocs}. In local development, Docker Compose builds the API gateway, auth service, and reports service from source. It also starts RabbitMQ and Redis \cite{dockerComposeDocs}. In production, the same services are pulled as Docker Hub images.
+The prototype runtime is containerized to keep local and deployed environments consistent. Docker Compose is used for local development to start all dependencies (RabbitMQ and Redis) alongside the backend services \cite{dockerComposeDocs}. Deployment is handled using a simple container-based approach: images are built and published, and Azure App Service is configured to run the latest images with environment configuration provided by the platform \cite{azureAppServiceContainersDocs}.
 
-The GitHub Actions workflow builds images for the gateway, auth service, and reports service \cite{githubActionsDocs}. After the images are pushed to Docker Hub, the workflow configures Azure App Service with the Compose file and restarts the application. This makes deployment more repeatable and follows common continuous delivery practice \cite{humble2010continuousDelivery,kim2016devopsHandbook}.
+Automation is implemented with GitHub Actions to build images, push them to a registry, and update the deployment configuration \cite{githubActionsDocs}. This reduces manual steps and matches continuous delivery practice, where build and deploy logic is kept in version-controlled pipelines \cite{humble2010continuousDelivery,kim2016devopsHandbook}.
 
 \vfplaceholderfigure
     {figure4-17-cicd-workflow.png}
     {0.80}
     {0.26}
-    {CI/CD workflow from GitHub push to Docker image build, Docker Hub push, Azure App Service configuration, and application restart.}
+    {CI/CD pipeline from source push to container build, publication, and Azure App Service deployment.}
     {fig:vietflood-cicd-workflow}
 
-\section{User Management Implementation}
+\FloatBarrier
+\section{Result Summary}
 
-User management is implemented in the auth service and exposed through the API gateway. The service can list users, load one user by ID, update a profile, update a user by ID, and delete a user. All roles use the same user table. The role value can be citizen, relief, or administrator.
+At the end of implementation, VietFlood can be run locally using Docker Compose and exercised through the mobile and web clients. The backend exposes REST endpoints for authentication and report management through the API gateway. A full endpoint list is summarized in Appendix~A (Table~\ref{tab:appendix-api-endpoints}), including representative response samples used in the evaluation.
 
-The web dashboard validates the profile before showing admin-only screens. Mobile profile screens use authenticated profile and update endpoints so users can update their own information. The role model is simple in this prototype: roles are stored in the database, and route access is checked by guards in the gateway.
+The system demonstrates the intended role split in practice: citizens submit reports, relief users browse location-aware views, and administrators review and update report status. These results are evaluated in Chapter~5 through scenario walkthroughs and functional test checklists.
 
 \vfplaceholderfigure
     {figure4-18-user-management.jpg}
     {0.80}
     {0.28}
-    {User management view showing citizen, relief, and admin accounts with profile and role information.}
+    {User management view for browsing accounts and roles in the dashboard.}
     {fig:vietflood-user-management}
 
 \FloatBarrier

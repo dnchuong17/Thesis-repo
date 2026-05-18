@@ -1,12 +1,20 @@
 \babel@toc {english}{}\relax 
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {2.1}{\ignorespaces Mapping of System Functionalities to Cultural Preservation Outcomes}}{12}{table.2.1}%
-\contentsline {table}{\numberline {2.2}{\ignorespaces Comparison of Features and Functionalities in DHC, VNFAM, and ArtSteps Systems}}{17}{table.2.2}%
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {3.1}{\ignorespaces Cloud Service Integration and Scalability Benefits in VCaiLuong}}{32}{table.3.1}%
+\contentsline {table}{\numberline {3.1}{\ignorespaces Main materials and tools used in VietFlood development.}}{17}{table.3.1}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {4.1}{\ignorespaces Main implementation tools used in VietFlood.}}{23}{table.4.1}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Comparison of message brokers for the VietFlood backend.}}{24}{table.4.2}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {5.1}{\ignorespaces Evaluation summary of key VietFlood workflows.}}{34}{table.5.1}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {table}{\numberline {5.1}{\ignorespaces Comparison of DHC, VNFAM, and VCaiLuong Systems}}{61}{table.5.1}%
+\contentsline {table}{\numberline {A.1}{\ignorespaces VietFlood REST endpoints exposed by the API gateway.}}{40}{table.A.1}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
+\contentsline {table}{\numberline {C.1}{\ignorespaces Authentication and user management test cases.}}{43}{table.C.1}%
+\contentsline {table}{\numberline {C.2}{\ignorespaces Report workflow test cases.}}{43}{table.C.2}%
+\contentsline {table}{\numberline {C.3}{\ignorespaces Socket.IO live tracking test cases.}}{44}{table.C.3}%
+\addvspace {10\p@ }
+\contentsline {table}{\numberline {D.1}{\ignorespaces Environment variables used to deploy VietFlood with Docker Compose.}}{45}{table.D.1}%

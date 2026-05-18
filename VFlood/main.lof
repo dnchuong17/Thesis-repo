@@ -1,43 +1,42 @@
 \babel@toc {english}{}\relax 
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {2.1}{\ignorespaces Lifecycle of a VietFlood citizen report from mobile submission to review status.}}{8}{figure.2.1}%
-\contentsline {figure}{\numberline {2.2}{\ignorespaces Comparison between a monolithic backend and the VietFlood microservices structure.}}{9}{figure.2.2}%
-\contentsline {figure}{\numberline {2.3}{\ignorespaces Evidence upload and review flow in VietFlood.}}{11}{figure.2.3}%
-\contentsline {figure}{\numberline {2.4}{\ignorespaces Mobile evidence upload and dashboard evidence review in VietFlood.}}{12}{figure.2.4}%
+\contentsline {figure}{\numberline {2.1}{\ignorespaces VietFlood report flow from mobile submission to administrator review status.}}{5}{figure.2.1}%
+\contentsline {figure}{\numberline {2.2}{\ignorespaces High-level contrast between a monolithic backend and the VietFlood service split.}}{7}{figure.2.2}%
+\contentsline {figure}{\numberline {2.3}{\ignorespaces Example views of evidence upload on mobile and evidence review on the dashboard.}}{8}{figure.2.3}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Use case diagram for the citizen actor in VietFlood.}}{15}{figure.3.1}%
-\contentsline {figure}{\numberline {3.2}{\ignorespaces Use case diagram for the relief actor in VietFlood.}}{16}{figure.3.2}%
-\contentsline {figure}{\numberline {3.3}{\ignorespaces Use case diagram for the administrator actor in VietFlood.}}{16}{figure.3.3}%
-\contentsline {figure}{\numberline {3.4}{\ignorespaces VietFlood system architecture diagram.}}{18}{figure.3.4}%
-\contentsline {figure}{\numberline {3.5}{\ignorespaces Database schema diagram for VietFlood.}}{19}{figure.3.5}%
-\contentsline {figure}{\numberline {3.6}{\ignorespaces Class or module diagram for the report workflow.}}{20}{figure.3.6}%
-\contentsline {figure}{\numberline {3.7}{\ignorespaces Sequence diagram for creating a VietFlood report.}}{20}{figure.3.7}%
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Citizen capabilities supported by VietFlood (use case view).}}{11}{figure.3.1}%
+\contentsline {figure}{\numberline {3.2}{\ignorespaces Relief browsing features supported by VietFlood (use case view).}}{11}{figure.3.2}%
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Administrator review and management features (use case view).}}{12}{figure.3.3}%
+\contentsline {figure}{\numberline {3.4}{\ignorespaces System architecture overview of VietFlood components and their interactions.}}{13}{figure.3.4}%
+\contentsline {figure}{\numberline {3.5}{\ignorespaces Prototype database schema showing the core entities and relationships.}}{15}{figure.3.5}%
+\contentsline {figure}{\numberline {3.6}{\ignorespaces Core data structures used in the report workflow.}}{15}{figure.3.6}%
+\contentsline {figure}{\numberline {3.7}{\ignorespaces Sequence of steps from report submission to persistence and cache update.}}{16}{figure.3.7}%
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {4.1}{\ignorespaces RabbitMQ communication flow between the API gateway, auth service, reports service, auth queue, and reports queue.}}{25}{figure.4.1}%
-\contentsline {figure}{\numberline {4.2}{\ignorespaces Citizen registration screen in the VietFlood mobile app.}}{26}{figure.4.2}%
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Citizen login screen in the VietFlood mobile app.}}{26}{figure.4.3}%
-\contentsline {figure}{\numberline {4.4}{\ignorespaces Admin login page in the VietFlood web dashboard.}}{26}{figure.4.4}%
-\contentsline {figure}{\numberline {4.5}{\ignorespaces Refresh-token flow from mobile or web client through the API gateway, auth service, refresh-token table, and new access token response.}}{26}{figure.4.5}%
-\contentsline {figure}{\numberline {4.6}{\ignorespaces Report creation flow from mobile form submission to Cloudinary upload, RabbitMQ message, PostgreSQL insert, and Redis cache write.}}{27}{figure.4.6}%
-\contentsline {figure}{\numberline {4.7}{\ignorespaces Shared common library structure showing LoggerService, RedisService, CloudinaryService, and the backend modules that import them.}}{28}{figure.4.7}%
-\contentsline {figure}{\numberline {4.8}{\ignorespaces Socket.IO live tracking flow with send-location, receive-location, location-error, and user-disconnected events.}}{28}{figure.4.8}%
-\contentsline {figure}{\numberline {4.9}{\ignorespaces Citizen report list or citizen home screen showing submitted reports, status labels, and report location information.}}{29}{figure.4.9}%
-\contentsline {figure}{\numberline {4.10}{\ignorespaces Create report form in the VietFlood mobile app.}}{29}{figure.4.10}%
-\contentsline {figure}{\numberline {4.11}{\ignorespaces Evidence upload in the VietFlood mobile app.}}{29}{figure.4.11}%
-\contentsline {figure}{\numberline {4.12}{\ignorespaces Relief report list in the mobile app.}}{30}{figure.4.12}%
-\contentsline {figure}{\numberline {4.13}{\ignorespaces Relief map screen in the mobile app.}}{30}{figure.4.13}%
-\contentsline {figure}{\numberline {4.14}{\ignorespaces Admin dashboard overview with report statistics, search, status filters, report cards, and evidence thumbnails.}}{30}{figure.4.14}%
-\contentsline {figure}{\numberline {4.15}{\ignorespaces Admin evidence review and status update screen for pending, verified, resolved, and rejected reports.}}{31}{figure.4.15}%
-\contentsline {figure}{\numberline {4.16}{\ignorespaces CI/CD workflow from GitHub push to Docker image build, Docker Hub push, Azure App Service configuration, and application restart.}}{31}{figure.4.16}%
-\contentsline {figure}{\numberline {4.17}{\ignorespaces User management view showing citizen, relief, and admin accounts with profile and role information.}}{32}{figure.4.17}%
-\addvspace {10\p@ }
+\contentsline {figure}{\numberline {4.1}{\ignorespaces RabbitMQ message routing between the API gateway and internal services.}}{19}{figure.4.1}%
+\contentsline {figure}{\numberline {4.2}{\ignorespaces Mobile registration view used to create a citizen account.}}{20}{figure.4.2}%
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Mobile sign-in view that returns access and refresh tokens.}}{20}{figure.4.3}%
+\contentsline {figure}{\numberline {4.4}{\ignorespaces Administrator sign-in view in the web dashboard.}}{20}{figure.4.4}%
+\contentsline {figure}{\numberline {4.5}{\ignorespaces Refresh token rotation sequence for renewing access tokens and invalidating old refresh tokens.}}{20}{figure.4.5}%
+\contentsline {figure}{\numberline {4.6}{\ignorespaces End-to-end report handling pipeline from submission to persistence and cache refresh.}}{21}{figure.4.6}%
+\contentsline {figure}{\numberline {4.7}{\ignorespaces Structure of the shared utilities package used by backend services (logging, Redis, Cloudinary).}}{22}{figure.4.7}%
+\contentsline {figure}{\numberline {4.8}{\ignorespaces Socket.IO location event flow including validation, broadcast, and error responses.}}{22}{figure.4.8}%
+\contentsline {figure}{\numberline {4.9}{\ignorespaces Citizen report list showing submissions and current status values.}}{23}{figure.4.9}%
+\contentsline {figure}{\numberline {4.10}{\ignorespaces Report creation form used to enter description and location fields.}}{23}{figure.4.10}%
+\contentsline {figure}{\numberline {4.11}{\ignorespaces Evidence selection and upload workflow on the mobile client.}}{23}{figure.4.11}%
+\contentsline {figure}{\numberline {4.12}{\ignorespaces Relief list view for browsing broader report records.}}{23}{figure.4.12}%
+\contentsline {figure}{\numberline {4.13}{\ignorespaces Relief map view for locating reports spatially.}}{23}{figure.4.13}%
+\contentsline {figure}{\numberline {4.14}{\ignorespaces Administrator dashboard overview with report cards, filters, and evidence thumbnails.}}{24}{figure.4.14}%
+\contentsline {figure}{\numberline {4.15}{\ignorespaces Evidence review and status update screen used by administrators.}}{24}{figure.4.15}%
+\contentsline {figure}{\numberline {4.16}{\ignorespaces CI/CD pipeline from source push to container build, publication, and Azure App Service deployment.}}{25}{figure.4.16}%
+\contentsline {figure}{\numberline {4.17}{\ignorespaces User management view for browsing accounts and roles in the dashboard.}}{26}{figure.4.17}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
 \addvspace {10\p@ }
-\contentsline {figure}{\numberline {B.1}{\ignorespaces Citizen report creation screen.}}{42}{figure.B.1}%
-\contentsline {figure}{\numberline {B.2}{\ignorespaces Evidence upload screen.}}{42}{figure.B.2}%
-\contentsline {figure}{\numberline {B.3}{\ignorespaces Relief worker report list screen.}}{42}{figure.B.3}%
-\contentsline {figure}{\numberline {B.4}{\ignorespaces Admin dashboard overview.}}{42}{figure.B.4}%
+\addvspace {10\p@ }
+\contentsline {figure}{\numberline {B.1}{\ignorespaces Mobile report creation screen (citizen workflow).}}{36}{figure.B.1}%
+\contentsline {figure}{\numberline {B.2}{\ignorespaces Mobile evidence selection and upload screen.}}{36}{figure.B.2}%
+\contentsline {figure}{\numberline {B.3}{\ignorespaces Relief report list screen for browsing incoming records.}}{36}{figure.B.3}%
+\contentsline {figure}{\numberline {B.4}{\ignorespaces Administrator dashboard overview with report list and filters.}}{36}{figure.B.4}%
 \addvspace {10\p@ }
 \addvspace {10\p@ }
