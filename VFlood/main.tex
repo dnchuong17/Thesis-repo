@@ -116,6 +116,10 @@
   \renewcommand{\bibname}{Bibliography}
 }
 \renewcommand\lstlistlistingname{List of Listings}
+\newcommand{\keywords}[1]{%
+  \par\medskip
+  \noindent\textbf{Keywords:}\enspace #1\par
+}
 
 %% TODO: Put all the figure files inside the images folder
 \graphicspath{{images/}}
@@ -259,7 +263,7 @@ Flood response depends on small pieces of local information becoming useful at t
 VietFlood is implemented as a multi-platform prototype. The backend uses NestJS with an API gateway, an authentication service, a reports service, and a Socket.IO tracking gateway. RabbitMQ is used for service-to-service communication. PostgreSQL is used to store users, refresh tokens and flood reports using TypeORM. Redis is used to support cached report lookup. Cloudinary is used to store uploaded evidence files. The common infrastructure code is under \texttt{vietflood\_common} with reusable logging, Redis and Cloudinary utilities. The mobile app is designed with Expo React Native for citizen and relief workflows. The online dashboard is designed with Next.js, React, Typescript and Tailwind CSS for the admins.
 The prototype demonstrates the key workflow from report creation to review. Citizens can register, login, create Flood Report, offer administration address fields and coordinates, urgency and severity, submit photo evidence. Relief users can explore wider report views and map related screens. The web dashboard enables administrators to access reporter information, search and filter reports, preview evidence, manage users and alter report state utilizing pending, verified, resolved and rejected statuses. VietFlood additionally has live tracking path where linked clients transmit location updates over Socket.IO after latitude and longitude confirmation at the gate.
 The work focuses on system design and implementation, not flood prediction or emergency dispatch. The final prototype illustrates the integration of mobile reporting, role-based access control, evidence storage, real-time location events, shared backend utilities, and container-based deployment in a flood reporting system that is specifically designed for Vietnam. While it is only a prototype, VietFlood gives a functioning basis for the collection of field reports and makes them easier to review.
-Keywords: VietFlood, flood reporting, relief coordination, real-time tracking, microservice design, NestJS, React Native, Next.js, RabbitMQ, PostgreSQL, Redis, Cloudinary
+\keywords{VietFlood; flood reporting; relief coordination; real-time tracking; microservice design; NestJS; React Native; Next.js; RabbitMQ; PostgreSQL; Redis; Cloudinary.}
 
 
 
