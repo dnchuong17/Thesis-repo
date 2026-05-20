@@ -1,28 +1,23 @@
-\begingroup
-\titlespacing*{\section}{0pt}{0.8em}{0.45em}
+\titlespacing*{\section}{0pt}{0.8em}{0.45em} \section{Final Summary}
+VietFlood was designed as a working prototype to translate ad-hoc flood observations into structured reports that can be searched, evaluated and updated. It’s about reporting and coordination help, not about flood prediction. A citizen can file a report from a phone with location, description and optional photo evidence and that report is available for follow up instead of disappearing in chat history.
 
-\section{Closing Summary}
-VietFlood was built as a working prototype that turns ad-hoc flood observations into structured reports that can be searched, reviewed, and updated. The project focuses on reporting and coordination support, not flood prediction. A citizen can submit a report from a phone with a location, description, and optional photo evidence, and that report remains available for follow-up rather than disappearing in chat history.
+The supplied system consists of a NestJS backend divided into an API gateway, an authentication service and a reporting service, an Expo React Native mobile application for the citizens and relief flows and a Next.js dashboard for the administrators \cite{nestjsDocs,expoDocs,nextjsDocs}. Reports are persisted in PostgreSQL using TypeORM, evidence is uploaded to Cloudinary and saved as metadata, and report lookups can be sped-up with Redis caching \cite{typeormDocs,cloudinaryUploadDocs,redisDocs}. The gateway performs JWT based role checks for the segregation of citizen reporting, relief browsing and administrator review \cite{jones2015jwt}. The RabbitMQ message patterns are used for the service-to-service work, so the HTTP concerns remain in the gateway and the business logic in internal services \cite{rabbitmqConfirmsDocs,nestjsMicroservicesDocs}. This separation follows conventional microservice design recommendations, but is still small enough to be deployed as a prototype \cite{fowlerLewis2014microservices,dragoni2017microservices,thones2015microservices}
 
-The delivered system includes a NestJS backend split into an API gateway, an authentication service, and a reports service; an Expo React Native mobile application for citizen and relief flows; and a Next.js dashboard for administrators \cite{nestjsDocs,expoDocs,nextjsDocs}. Reports are persisted in PostgreSQL through TypeORM, evidence is uploaded to Cloudinary and stored as metadata, and report lookups can be accelerated with Redis caching \cite{typeormDocs,cloudinaryUploadDocs,redisDocs}. The gateway uses JWT-based role checks to separate citizen reporting, relief browsing, and administrator review \cite{jones2015jwt}. Service-to-service work is handled using RabbitMQ message patterns to keep HTTP concerns in the gateway and business logic in internal services \cite{rabbitmqConfirmsDocs,nestjsMicroservicesDocs}. This separation follows common microservice design guidance while remaining small enough to deploy as a prototype \cite{fowlerLewis2014microservices,dragoni2017microservices,thones2015microservices}.
+The prototype shows the complete cycle of reporting: report creation, archiving with evidentiary meta data, listing and retrieval using secure endpoints and change of status when approved by an administrator. In this version the relief role is deliberately read-focused. That decision maintains status updates in administrator control, since status is the primary trust signal that is shown back to other users.
 
-The prototype demonstrates the end-to-end reporting loop: create a report, store it with evidence metadata, list and retrieve it through protected endpoints, and update its status after administrator review. The relief role is intentionally read-focused in this version. That decision keeps status changes under administrator control, because status is the main trust signal shown back to other users.
-
-The evaluation in Chapter~5 verifies functional coverage through scenario walkthroughs and inspection of the delivered services and clients. VietFlood still needs field validation under real flood conditions, weak connectivity, and higher traffic before it can be considered for operational use.
+In Chapter~5 the evaluation confirms the functional coverage by means of scenario walkthroughs and examination of the offered services and clients. VietFlood needs to be validated under real flood conditions with inadequate connectivity and more traffic before it can be considered for operational use.
 
 \section{Recommended Next Steps}
 
-The next improvements should be driven by real usage feedback on the reporting flow. If users cannot quickly provide the minimum information (location, short description, and one photo), the system will not be useful when conditions are stressful.
+The following enhancements should be based on genuine usage input on the reporting flow. If users are unable to quickly submit the minimum information (location, short description, and one photo), the system will not be useful in stressed settings.
 
-Several concrete engineering tasks follow from this prototype:
+From this prototype several concrete engineering tasks arise:
 \begin{itemize}[leftmargin=1.2em]
-    \item \textbf{Offline-first reporting:} add local drafts, queued uploads, retry logic, and clear client states for weak networks. Evidence should be compressed on-device, and server-side limits should be enforced to control abuse and storage cost.
-    \item \textbf{Data quality and de-duplication:} stabilize DTO naming and validation, and add duplicate detection based on time, distance, and visual similarity to reduce review workload.
-    \item \textbf{Review workflow improvements:} expand filters, add clustering views, and support lightweight triage notes so that administrators can process bursts of incoming reports.
-    \item \textbf{Tracking hardening:} tie Socket.IO channels to authenticated identities and apply authorization rules that match the intended operational policy.
-    \item \textbf{Operations and security:} add health checks, monitoring, and failure alerts; test refresh token rotation under concurrency; and strengthen deployment practices for repeatability and recovery \cite{humble2010continuousDelivery,kim2016devopsHandbook,dockerComposeDocs}.
+    \item \textbf{Offline-first reporting:} Local drafts, queued uploads, retry logic and clear client states for weak networks. Control abuse and storage cost by compressing evidence on-device and enforcing server-side restrictions.
+    \item \textbf{Data quality and de-duplication:} make DTO naming and validation more stable and add duplicate identification based on time, distance and visual resemblance to reduce review workload.
+    \item \textbf{Improved review workflow:} add clustering views, increase filters, support lightweight triage notes, so that administrators can evaluate bursts of incoming reports.
+    \item \textbf{Tracking hardening:} bind Socket.IO channels to authenticated identities and enforce permission rules in line with the planned operational policy.
+    \item \textbf{Operations and security:} add health checks, monitoring and failure alarms, test refresh token rotation under concurrency, and improve deployment methods for repeatability and recovery \cite{humble2010continuousDelivery,kim2016devopsHandbook,dockerComposeDocs}.
 \end{itemize}
 
-In a longer project timeline, VietFlood can also be extended beyond reporting: integration with official warning channels, evidence verification partnerships, and map-oriented aggregation for public information. Those extensions should be approached carefully, because public-facing status and location data raises privacy and safety concerns that go beyond the scope of this thesis.
-
-\endgroup
+In a longer project schedule VietFlood can also be expanded beyond reporting: integration with governmental warning channels, evidence verification collaborations and map-oriented aggregation for public information. The handling of those extensions should be done with care, as public facing status and location data brings privacy and safety problems that are out of the scope of this thesis.

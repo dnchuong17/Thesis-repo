@@ -125,23 +125,4 @@ N.~Provos and D.~Mazi{\`e}res, ``A future-adaptable password scheme,'' in {\em
   2026.
 \newblock Accessed: 2026-05-17.
 
-\bibitem{typescriptDocs}
-{TypeScript}, ``Typescript documentation.''
-  \url{https://www.typescriptlang.org/docs/}, 2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{reduxToolkitDocs}
-{Redux Toolkit}, ``Redux toolkit documentation.''
-  \url{https://redux-toolkit.js.org/}, 2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{reactDocs}
-{React}, ``React documentation.'' \url{https://react.dev/}, 2026.
-\newblock Accessed: 2026-05-17.
-
-\bibitem{tailwindDocs}
-{Tailwind Labs}, ``Tailwind css documentation.''
-  \url{https://tailwindcss.com/docs}, 2026.
-\newblock Accessed: 2026-05-17.
-
 \end{thebibliography}

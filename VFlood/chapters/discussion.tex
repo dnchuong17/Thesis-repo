@@ -1,75 +1,66 @@
-This chapter evaluates the VietFlood prototype as an implemented flood reporting system. The evaluation does not attempt to measure real-world impact in a live flood response operation. Instead, it checks whether the delivered backend services and client applications support the intended workflow from Chapter~4: users can authenticate, submit reports with location and evidence, store and retrieve reports, and review them through role-based interfaces.
+This chapter reviews the VietFlood prototype as an implemented flood reporting system. The evaluation is not intended to measure real-world impact in a live flood relief operation. Instead, it evaluates if the delivered backend services and client apps support the workflow described in Chapter~4: users may authenticate, submit reports with location and proof, save and retrieve reports and review reports through role-based interfaces.
 
-The evaluation uses scenario walkthroughs and source-level inspection of the API gateway, authentication service, reports service, mobile application, web dashboard, and shared library. A complete list of REST endpoints and representative responses are provided in Appendix~A (Table~\ref{tab:appendix-api-endpoints}). The system-level test cases used as a checklist for this evaluation are listed in Appendix~C (Tables~\ref{tab:appendix-auth-test-cases}--\ref{tab:appendix-tracking-test-cases}). The results here should be read as prototype validation rather than production certification.
+The evaluation is conducted via scenario walkthroughs and source-level inspection of the API gateway, authentication service, reporting service, mobile application, online dashboard, and shared library. The full list of the REST endpoints and indicative replies may be found in Appendix~A (Table~\ref{tab:appendix-api-endpoints}). The system-level test cases that are used as a checklist for this evaluation are shown in Appendix~C (Tables~\ref{tab:appendix-auth-test-cases}--\ref{tab:appendix-tracking-test-cases}). In this instance, the results are more like a prototype validation than a certification for production.
 
-\section{Evaluation Approach}
+\section{Evaluation Methods}
 
-The evaluation is structured around the three user roles supported by VietFlood:
+The evaluation is organized around three user roles offered by VietFlood:
+\textbf{Citizen:} sign up and sign in, submit flood reports with location and evidence, browse own report history on mobile. \textbf{Relief user:} navigate report information and location-based views on mobile. \textbf{Administrator:} examine reports, check evidences, update report status, and manage users on the web dashboard.
 
-\textbf{Citizen:} register and sign in, create flood reports with location and evidence, and view personal report history on mobile.
+On the backend, the API gateway is the public interface for HTTP routes and Socket.IO events\cite{socketioDocs}. The auth service handles authentication and profile logic. Report generation, update, deletion and cache handling are the responsibility of the reports service. The gateway communicates with internal services using RabbitMQ message patterns \cite{rabbitmqConfirmsDocs}. The division is consistent with the objective of having clear service roles and maintaining the system manageable as a prototype \cite{bass2021softwareArchitecture}.
 
-\textbf{Relief user:} browse report information and location-oriented views on mobile.
+\section{Coverage of Workflows}
 
-\textbf{Administrator:} review reports, inspect evidence, change report status, and manage users on the web dashboard.
+The main functional need is the report procedure from start to finish. Citizen submits report through mobile client. The gateway handles multipart form data, uploads evidence files to Cloudinary \cite{cloudinaryUploadDocs} and passes the final payload to the reports service over RabbitMQ \cite{rabbitmqConfirmsDocs}. The reports service persists the report in PostgreSQL and stores evidence metadata as JSON fields \cite{postgresqlJsonDocs}.  After creation and update operations, redis cache item is written to allow later lookups \cite{redisDocs}.
 
-On the backend, the API gateway acts as the public interface for HTTP routes and Socket.IO events \cite{socketioDocs}. Authentication and profile logic are handled by the auth service. Report creation, update, deletion, and cache handling are handled by the reports service. The gateway communicates with internal services through RabbitMQ message patterns \cite{rabbitmqConfirmsDocs}. This separation follows the goal of defining clear service responsibilities while keeping the system manageable as a prototype \cite{bass2021softwareArchitecture}.
-
-\section{Workflow Coverage}
-
-The central functional requirement is the end-to-end report workflow. A citizen submits a report from the mobile client. The gateway receives multipart form data, uploads evidence files to Cloudinary \cite{cloudinaryUploadDocs}, and forwards the final payload to the reports service through RabbitMQ \cite{rabbitmqConfirmsDocs}. The reports service persists the report in PostgreSQL and stores evidence metadata as JSON fields \cite{postgresqlJsonDocs}. After creation and update operations, a Redis cache entry is written to support subsequent lookups \cite{redisDocs}.
-
-On the review side, administrators use the web dashboard to list reports, inspect evidence thumbnails, and update status values such as \texttt{pending}, \texttt{verified}, \texttt{resolved}, and \texttt{rejected}. Relief users can read report information through role-restricted endpoints and present it in list and map oriented views on the mobile application. Together, these features form the expected loop: submission, storage, review, and status update.
+On the review side, administrators utilize the web dashboard to list reports, check evidence thumbnails, and update status values such as \texttt{pending}, \texttt{verified}, \texttt{resolved} and \texttt{rejected}. Relief users can read report information through role limited endpoints and display it in list and map oriented views on the mobile application. Combined these features constitute the desired loop: submission, storage, review and update of status.
 
 \begin{table}[H]
-    \centering
-    \caption{Observed coverage of key VietFlood workflows in the prototype.}
-    \label{tab:vietflood-functional-evaluation}
-    \scriptsize
-    \setlength{\tabcolsep}{5pt}
-    \renewcommand{\arraystretch}{1.25}
-    \begin{tabularx}{\textwidth}{|p{3.2cm}|p{4.1cm}|X|}
-        \hline
-        \textbf{Workflow} & \textbf{Primary interface} & \textbf{Observed behavior in prototype} \\
-        \hline
-        Citizen sign in and profile access & \texttt{/auth/sign\_in}, \texttt{/auth/profile} & Tokens are issued after password validation; protected profile data is returned when a JWT is provided. \\
-        \hline
-        Create report with evidence & \texttt{/reports/create} (multipart) & Evidence files are uploaded to Cloudinary and stored as metadata; the report is persisted in PostgreSQL and cached in Redis. \\
-        \hline
-        View citizen report history & \texttt{/reports/user} & The signed-in citizen can list reports associated with the current account. \\
-        \hline
-        Admin review and status update & Web dashboard + protected report routes & Administrators can list reports, inspect evidence, and update report status values through the gateway. \\
-        \hline
-        Live tracking broadcast & Socket.IO: \texttt{send-location} & Valid coordinate payloads are broadcast to connected clients; invalid payloads return an error event. \\
-        \hline
-    \end{tabularx}
+\centering
+\caption{Observed coverage of important VietFlood workflows in the prototype.}
+\label{tab:vietflood-functional-evaluation}
+\scriptsize
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{|p{3.2cm}|p{4.1cm}|X|}
+\hline
+\textbf{Workflow} & \textbf{Primary interface} & \textbf{Observed behavior in prototype} \\
+\hline
+Citizen sign in and profile access & \texttt{/auth/sign\_in}, \texttt{/auth/profile} & Tokens are issued after password validation, protected profile data is returned when a JWT is provided. \\
+\hline
+Create report with evidence & \texttt{/reports/create} (multipart) & Evidence files are uploaded to Cloudinary and stored as metadata; the report is persisted in PostgreSQL and cached in Redis. \\
+\hline
+View citizen report history & \texttt{/reports/user} & The signed-in citizen can list reports associated with the current account. \\
+\hline
+Admin review and status update & Web dashboard and protected report routes & Administrators can list reports, inspect evidence, and update report status values via the gateway. \\
+\hline
+Live tracking broadcast & Socket.IO: \texttt{send-location} & Broadcasts valid coordinate payloads to connected clients; returns an error event for invalid payloads. \\
+\hline
+\end{tabularx}
 \end{table}
 
-\section{Client Behavior Review}
+\section{Analysis of Client Behavior}
 
-The mobile application is the main field interface and is implemented with Expo React Native \cite{expoDocs,reactNativeDocs}. It supports citizen sign-in, profile viewing, report creation with evidence selection, and report history viewing. Relief features focus on reading and mapping report information rather than creating new reports, which matches the intended division of responsibilities between citizen reporting and relief awareness.
+The mobile application is the main field interface and is implemented using Expo React Native \cite{expoDocs,reactNativeDocs}. It offers citizen sign-in, view profile, report creation with evidence selection, see report history. Relief features are meant to read and map report information, not to create new reports, which fits with the planned separation of responsibilities between citizen reporting and relief awareness.
 
-The web dashboard is implemented with Next.js \cite{nextjsDocs} and is evaluated as an administrative workspace. Its main functions are report review, evidence inspection, and status updates. It also loads the current profile and blocks dashboard access when a user does not satisfy role checks.
+The online dashboard is developed using Next.js \cite{nextjsDocs} and assessed as an administrative workspace. Key functions include reviewing reports, inspecting evidence and providing status updates. It also loads the current profile and denies access to the dashboard if a user fails role checks.
 
-One weakness observed in the client layer is data contract consistency. The mobile code includes normalization logic for location fields such as \texttt{lat}/\texttt{lng} and \texttt{latitude}/\texttt{longitude}. This improves tolerance during development, but it indicates that the API contract should be stabilized before broader use, with consistent DTO validation and a single naming convention for coordinates and address fields.
+One of the weaknesses discovered is the data contract consistency in the client layer . The mobile code has logic for normalizing location fields such as \texttt{lat}/\texttt{lng} and \texttt{latitude}/\texttt{longitude}. This enhances tolerance during development but it shows that API contract should be locked down before wider use with consistent DTO validation and a single naming convention for coordinates and address fields. \section{Storage and Data Consistency}
 
-\section{Storage and Data Consistency}
+Evidence files are kept in Cloudinary while report data and evidence metadata are stored in PostgreSQL. This ensures that the database remains focused on organized fields and does not have to store raw media as database blobs \cite{cloudinaryUploadDocs}. Evidence metadata is saved as JSON fields (URL, public ID, resource type), which is a fair choice for a prototype, when the structure of the evidence is likely to change \cite{postgresqlJsonDocs}.
 
-Evidence files are stored in Cloudinary, while PostgreSQL stores report data and evidence metadata. This keeps the database focused on structured fields and avoids storing raw media as database blobs \cite{cloudinaryUploadDocs}. Evidence metadata is stored in JSON fields (URL, public ID, resource type), which is a reasonable prototype choice when the evidence structure may evolve \cite{postgresqlJsonDocs}.
+Redis cache is used sparingly. Create and update operations write a report cache entry . The report cache is emptied and refreshed when a report changes or is removed \cite{redisDocs}. This method avoids multiple reads per report lookup but is not optimized for large list searches. If VietFlood scales to larger map queries, provincial filtering or huge result sets, caching and indexing should be extended beyond single report keys, and pagination should be enforced across list endpoints. \section{Access Control and Security Concerns}
 
-The Redis cache is used conservatively. A report cache entry is written after create and update operations, and it is cleared and refreshed when a report changes or is deleted \cite{redisDocs}. This design reduces repeated reads for individual report lookups, but it does not optimize large list queries. If VietFlood expands to heavier map queries, province filtering, or large result sets, caching and indexing should be extended beyond single report keys, and pagination should be enforced across list endpoints.
+Route protection is implemented at the API gateway level with JWT authentication and role guards. Password is stored using bcrypt hashing \cite{provos1999bcrypt}. Identity and role claims are carried in JWT access tokens that are utilized for authorization choices \cite{jones2015jwt}. Refresh tokens are issued with a different secret and expiration policy, and are meant to assist session control and logout.
 
-\section{Access Control and Security Considerations}
-
-Route protection is enforced at the API gateway through JWT authentication and role guards. Passwords are stored using bcrypt hashing \cite{provos1999bcrypt}. JWT access tokens carry identity and role claims used for authorization decisions \cite{jones2015jwt}. Refresh tokens are issued using a separate secret and expiration policy and are intended to support session control and logout.
-
-Several security concerns remain prototype-level. Refresh token rotation and revocation should be tested under concurrent refresh requests and replay attempts. Socket.IO tracking currently validates coordinate ranges, but the tracking channel should be tied to authenticated identities and a clearer authorization model. Evidence upload should also enforce stricter limits on file size, type, and count to reduce abuse and unexpected storage cost.
+There are still several security issues with prototypes. Test refresh token rotation and revocation with concurrent refresh token requests and replay attempts. Currently, Socket.IO tracking validates coordinate ranges, but the tracking channel should be coupled to verified IDs and a clearer authorization model. Evidence upload should also have stronger constraints on file size, kind and count to minimize abuse and unexpected storage cost.
 
 \section{Deployment Considerations}
 
-Local deployment uses Docker Compose to run the API gateway, services, RabbitMQ, and Redis in a repeatable environment \cite{dockerComposeDocs}. The prototype deployment workflow builds Docker images and deploys them to Azure App Service through GitHub Actions \cite{githubActionsDocs,azureAppServiceContainersDocs}. Runtime configuration uses environment variables for database connectivity, RabbitMQ, Redis, JWT secrets, refresh token secret, Cloudinary credentials, and admin seed settings.
+To deploy locally we execute the API gateway, services, RabbitMQ and Redis together in a repeatable environment with Docker Compose \cite{dockerComposeDocs}. The prototype deployment workflow creates Docker images and deploys them to Azure App Service using GitHub Actions \cite{githubActionsDocs,azureAppServiceContainersDocs}. Runtime configuration Environment variables for database connectivity, RabbitMQ, Redis, JWT secrets, refresh token secret, Cloudinary credentials, and admin seed settings.
 
-The main operational gap is observability. The shared logger provides a consistent logging interface, but a more reliable deployment would also include explicit health endpoints, service-level metrics, and alerting. These are important for detecting failures such as evidence upload errors, queue issues, or service unavailability without manual inspection.
+The major operational gap is observability. The shared logger provides a standard logging interface, but a more robust implementation would additionally involve explicit health endpoints, service level metrics and alerting. These are helpful for spotting faults like upload evidence failures, queue issues or service unavailability without manual inspection.
 
-\section{Summary of Findings}
+\section{Conclusions}
 
-The evaluation shows that VietFlood meets the core prototype requirements. Citizens can submit reports with location and evidence; the backend stores reports and evidence metadata; administrators can review reports and change status; and relief users can browse report information with location context. The main gaps are hardening tasks needed for real deployment: a stable API contract, systematic tests under adverse network conditions, better upload controls, stronger tracking authorization, and monitoring suitable for unattended operation. Within the thesis scope, VietFlood demonstrates that a microservice-based design using NestJS microservice support \cite{nestjsMicroservicesDocs} can provide a practical foundation for multi-platform flood situation reporting.
+The assessment indicates that VietFlood fits the core needs of the prototype. The app allows citizens to submit reports including location and evidence; the backend maintains reports and evidence metadata; administrators can check reports and alter status; and relief users may access report information with location context. The key gaps are hardening tasks required for genuine deployment: a reliable API contract, systematic tests under bad network conditions, better upload limits, tighter tracking authorization, and monitoring fit for unattended operation. In the context of the thesis, VietFlood shows that a microservice-based design with NestJS microservice support \cite{nestjsMicroservicesDocs} may provide a suitable framework for multi-platform flood scenario reporting.
